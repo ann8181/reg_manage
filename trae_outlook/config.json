@@ -1,0 +1,10 @@
+{
+    "browser_path": "",
+    "proxy": "",
+    "Bot_protection_wait": 12,
+    "max_captcha_retries": 2,
+    "concurrent_flows": 5,
+    "max_tasks": 50,
+    "outlook_results_dir": "Results",
+    "trae_results_dir": "TraeAccounts"
+}

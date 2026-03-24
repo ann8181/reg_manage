@@ -1,0 +1,5 @@
+faker
+requests
+httpx
+playwright==1.53.0
+python-dateutil

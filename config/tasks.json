@@ -1,0 +1,252 @@
+{
+    "categories": {
+        "email": {
+            "name": "邮箱任务",
+            "description": "临时邮箱和真实邮箱注册服务",
+            "enabled": true,
+            "groups": {
+                "temp_email": {
+                    "name": "临时邮箱 API",
+                    "description": "无需注册的临时邮箱服务",
+                    "enabled": true,
+                    "tasks": {
+                        "email.mailtm": {
+                            "name": "Mail.tm API",
+                            "description": "Mail.tm 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.mailtm",
+                            "class": "MailTmProvider",
+                            "results_dir": "results/mailtm"
+                        },
+                        "email.guerrillamail": {
+                            "name": "GuerrillaMail API",
+                            "description": "GuerrillaMail 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.guerrillamail",
+                            "class": "GuerrillaMailProvider",
+                            "results_dir": "results/guerrillamail"
+                        },
+                        "email.getnada": {
+                            "name": "GetNada API",
+                            "description": "GetNada 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.getnada",
+                            "class": "GetNadaProvider",
+                            "results_dir": "results/getnada"
+                        },
+                        "email.yopmail": {
+                            "name": "YopMail API",
+                            "description": "YopMail 临时邮箱 API (仅收取)",
+                            "enabled": false,
+                            "module": "tasks.email.yopmail",
+                            "class": "YopMailProvider",
+                            "results_dir": "results/yopmail"
+                        }
+                    }
+                },
+                "real_email": {
+                    "name": "真实邮箱注册",
+                    "description": "需要真实注册的邮箱服务",
+                    "enabled": true,
+                    "tasks": {
+                        "email.outlook": {
+                            "name": "Outlook 注册",
+                            "description": "微软 Outlook 邮箱注册 + 邮件收取",
+                            "enabled": false,
+                            "module": "tasks.email.outlook",
+                            "class": "OutlookRegister",
+                            "results_dir": "results/outlook"
+                        },
+                        "email.gmail": {
+                            "name": "Gmail 邮件收取",
+                            "description": "Gmail IMAP 邮件收取",
+                            "enabled": false,
+                            "module": "tasks.email.gmail",
+                            "class": "GmailClient",
+                            "results_dir": "results/gmail"
+                        }
+                    }
+                },
+                "temp_convert": {
+                    "name": "临时邮箱转换",
+                    "description": "将临时邮箱转换为 API 版本",
+                    "enabled": true,
+                    "tasks": {
+                        "email.tempmail": {
+                            "name": "TempMail 转换",
+                            "description": "Web 临时邮箱转 API 版本",
+                            "enabled": false,
+                            "module": "tasks.email.tempmail",
+                            "class": "TempMailConverter",
+                            "results_dir": "results/tempmail"
+                        }
+                    }
+                }
+            }
+        },
+        "ai": {
+            "name": "AI 服务任务",
+            "description": "各种 AI 服务的注册和授权",
+            "enabled": true,
+            "groups": {
+                "free_ai": {
+                    "name": "免费 AI API",
+                    "description": "可获取免费 API 的 AI 服务",
+                    "enabled": true,
+                    "tasks": {
+                        "ai.github": {
+                            "name": "GitHub 注册",
+                            "description": "GitHub 账号注册 (用于 Copilot 等)",
+                            "enabled": false,
+                            "module": "tasks.ai.github",
+                            "class": "GitHubRegister",
+                            "results_dir": "results/github"
+                        },
+                        "ai.claude": {
+                            "name": "Claude 注册",
+                            "description": "Anthropic Claude AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.claude",
+                            "class": "ClaudeRegister",
+                            "results_dir": "results/claude"
+                        },
+                        "ai.gpt": {
+                            "name": "GPT 注册",
+                            "description": "OpenAI GPT API 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.gpt",
+                            "class": "GPTRegister",
+                            "results_dir": "results/gpt"
+                        },
+                        "ai.gemini": {
+                            "name": "Gemini 注册",
+                            "description": "Google Gemini AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.gemini",
+                            "class": "GeminiRegister",
+                            "results_dir": "results/gemini"
+                        },
+                        "ai.aistudio": {
+                            "name": "AI Studio 注册",
+                            "description": "Google AI Studio 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.aistudio",
+                            "class": "AIStudioRegister",
+                            "results_dir": "results/aistudio"
+                        },
+                        "ai.business_gemini": {
+                            "name": "Business Gemini",
+                            "description": "Google Business Gemini 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.business_gemini",
+                            "class": "BusinessGeminiRegister",
+                            "results_dir": "results/business_gemini"
+                        },
+                        "ai.grok": {
+                            "name": "Grok 注册",
+                            "description": "xAI Grok 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.grok",
+                            "class": "GrokRegister",
+                            "results_dir": "results/grok"
+                        }
+                    }
+                },
+                "coding_ai": {
+                    "name": "编程 AI 工具",
+                    "description": "各种编程辅助 AI 工具",
+                    "enabled": true,
+                    "tasks": {
+                        "ai.copilot": {
+                            "name": "Copilot 注册",
+                            "description": "GitHub Copilot 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.copilot",
+                            "class": "CopilotRegister",
+                            "results_dir": "results/copilot"
+                        },
+                        "ai.cursor": {
+                            "name": "Cursor AI 注册",
+                            "description": "Cursor AI IDE 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.cursor",
+                            "class": "CursorRegister",
+                            "results_dir": "results/cursor"
+                        },
+                        "ai.augment": {
+                            "name": "Augment AI 注册",
+                            "description": "Augment AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.augment",
+                            "class": "AugmentRegister",
+                            "results_dir": "results/augment"
+                        },
+                        "ai.windsurf": {
+                            "name": "Windsurf AI 注册",
+                            "description": "Windsurf AI IDE 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.windsurf",
+                            "class": "WindsurfRegister",
+                            "results_dir": "results/windsurf"
+                        },
+                        "ai.codex": {
+                            "name": "Codex 授权",
+                            "description": "OpenAI Codex API 授权",
+                            "enabled": false,
+                            "module": "tasks.ai.codex",
+                            "class": "CodexAuth",
+                            "results_dir": "results/codex"
+                        }
+                    }
+                },
+                "chinese_ai": {
+                    "name": "国产 AI 工具",
+                    "description": "国产 AI 编程和辅助工具",
+                    "enabled": true,
+                    "tasks": {
+                        "ai.trae": {
+                            "name": "Trae 注册",
+                            "description": "Trae AI IDE 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.trae",
+                            "class": "TraeRegister",
+                            "results_dir": "results/trae"
+                        },
+                        "ai.opencode": {
+                            "name": "OpenCode 注册",
+                            "description": "OpenCode AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.opencode",
+                            "class": "OpenCodeRegister",
+                            "results_dir": "results/opencode"
+                        },
+                        "ai.kiro": {
+                            "name": "Kiro AI 注册",
+                            "description": "Kiro CLI AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.kiro",
+                            "class": "KiroRegister",
+                            "results_dir": "results/kiro"
+                        },
+                        "ai.zen": {
+                            "name": "Zen AI 注册",
+                            "description": "Zen AI IDE 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.zen",
+                            "class": "ZenRegister",
+                            "results_dir": "results/zen"
+                        },
+                        "ai.nvidia": {
+                            "name": "NVIDIA 注册",
+                            "description": "NVIDIA AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.nvidia",
+                            "class": "NvidiaRegister",
+                            "results_dir": "results/nvidia"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -26,6 +26,8 @@
 | email.tempmailorg | TempMail.org API | TempMail.org 临时邮箱 API |
 | email.gmailnator | Gmailnator API | Gmailnator 临时 Gmail API |
 | email.fakemail | FakeMail API | FakeMail 临时邮箱 API (Cloudflare) |
+| email.fakemailcloudflare | FakeMail Cloudflare API | FakeMail Cloudflare 临时邮箱 API |
+| email.selfhosted | Self-Hosted Mail | 自托管临时邮箱服务 |
 
 #### 真实邮箱注册 (real_email)
 
@@ -79,6 +81,27 @@
 | ai.kiro | Kiro AI 注册 | Kiro CLI AI 注册 |
 | ai.zen | Zen AI 注册 | Zen AI IDE 注册 |
 | ai.nvidia | NVIDIA 注册 | NVIDIA AI 注册 |
+
+### 短信任务 (sms)
+
+| 任务ID | 名称 | 说明 |
+|--------|------|------|
+| sms.freeotpapi | FreeOTP API | 免费短信OTP API |
+| sms.otpgateway | OTP Gateway | OTP Gateway 短信接码 |
+
+### 代理任务 (proxy)
+
+| 任务ID | 名称 | 说明 |
+|--------|------|------|
+| proxy.pool | Proxy Pool | 代理池管理服务 |
+| proxy.checker | Proxy Checker | 代理检测工具 |
+
+### 验证码任务 (captcha)
+
+| 任务ID | 名称 | 说明 |
+|--------|------|------|
+| captcha.2captcha | 2Captcha | 2Captcha 验证码识别 |
+| captcha.anticaptcha | AntiCaptcha | AntiCaptcha 验证码识别 |
 
 ## 安装
 
@@ -231,18 +254,26 @@ auto-register-tasks/
 │   │   ├── onemail.py      # 1SecMail
 │   │   ├── tempmail_org.py # TempMail.org
 │   │   ├── gmailnator.py   # Gmailnator
-│   │   └── fakemail.py     # FakeMail
-│   └── ai/                  # AI服务任务模块
-│       ├── github.py
-│       ├── claude.py
-│       ├── copilot.py
-│       ├── cursor.py
-│       ├── perplexity.py    # Perplexity
-│       ├── deepseek.py      # DeepSeek
-│       ├── mistral.py      # Mistral
-│       ├── groq.py         # Groq
-│       ├── cohere.py      # Cohere
-│       └── replicate.py    # Replicate
+│   │   ├── fakemail.py     # FakeMail
+│   │   ├── fakemail_cloudflare.py
+│   │   └── selfhosted.py   # Self-Hosted
+│   ├── ai/                  # AI服务任务模块
+│   │   ├── github.py
+│   │   ├── claude.py
+│   │   ├── copilot.py
+│   │   ├── cursor.py
+│   │   ├── perplexity.py    # Perplexity
+│   │   ├── deepseek.py      # DeepSeek
+│   │   ├── mistral.py      # Mistral
+│   │   ├── groq.py         # Groq
+│   │   ├── cohere.py       # Cohere
+│   │   └── replicate.py    # Replicate
+│   ├── sms/                 # 短信任务模块
+│   │   └── __init__.py     # FreeOTP, OtpGateway
+│   ├── proxy/                # 代理任务模块
+│   │   └── __init__.py     # ProxyPool, ProxyChecker
+│   └── captcha/              # 验证码任务模块
+│       └── __init__.py      # 2Captcha, AntiCaptcha
 ├── logs/                     # 日志目录
 ├── results/                  # 账户结果存储
 ├── config.json               # 全局配置
@@ -255,12 +286,16 @@ auto-register-tasks/
 
 本项目整合参考了以下开源工具：
 
-- [trae_outlook](https://github.com/your-repo/trae_outlook) - Outlook + Trae 账号注册
 - [tmpmail](https://github.com/sdushantha/tmpmail) - POSIX shell 临时邮箱 (4.2k stars)
 - [tempmail-python](https://github.com/cubicbyte/tempmail-python) - Python 临时邮箱库
 - [AccountGeneratorHelper](https://github.com/Dionis1902/AccountGeneratorHelper) - 账号生成综合库 (250 stars)
 - [Mailjs](https://github.com/cemalgnlts/Mailjs) - Node.js 邮件自动化
 - [fakemail](https://github.com/CH563/fakemail) - Cloudflare 临时邮箱 (221 stars)
+- [flux-mail](https://github.com/shubhexists/flux-mail) - Rust 自部署 SMTP 服务
+- [otpgateway](https://github.com/knadh/otpgateway) - OTP 验证服务器 (519 stars)
+- [free-otp-api](https://github.com/Shelex/free-otp-api) - 免费 OTP API
+- [spoon](https://github.com/Jiramew/spoon) - 代理池构建工具 (173 stars)
+- 2Captcha, AntiCaptcha - 验证码识别服务
 - Mail.tm API, GuerrillaMail API, GetNada API, YopMail API
 - 各种 AI 服务的官方注册流程
 

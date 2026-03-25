@@ -34,6 +34,33 @@
         },
         "fakemail": {
             "api_url": "https://fakemail.top"
+        },
+        "fakemailcloudflare": {
+            "api_url": "https://fakemail.top"
+        },
+        "selfhosted": {
+            "api_url": "http://localhost:8025"
+        }
+    },
+    "sms_services": {
+        "freeotpapi": {
+            "api_url": "https://free-otp-api-8e544c41220a.herokuapp.com"
+        },
+        "otpgateway": {
+            "api_url": "http://localhost:9000"
+        }
+    },
+    "proxy_services": {
+        "pool": {
+            "api_url": "http://localhost:8080"
+        }
+    },
+    "captcha_services": {
+        "2captcha": {
+            "api_key": ""
+        },
+        "anticaptcha": {
+            "api_key": ""
         }
     },
     "ai_services": {

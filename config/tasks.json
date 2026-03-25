@@ -73,6 +73,22 @@
                             "module": "tasks.email.fakemail",
                             "class": "FakeMailTask",
                             "results_dir": "results/fakemail"
+                        },
+                        "email.fakemailcloudflare": {
+                            "name": "FakeMail Cloudflare API",
+                            "description": "FakeMail Cloudflare 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.fakemail_cloudflare",
+                            "class": "FakeMailCloudflareTask",
+                            "results_dir": "results/fakemailcloudflare"
+                        },
+                        "email.selfhosted": {
+                            "name": "Self-Hosted Mail",
+                            "description": "自托管临时邮箱服务",
+                            "enabled": false,
+                            "module": "tasks.email.selfhosted",
+                            "class": "SelfHostedMailTask",
+                            "results_dir": "results/selfhosted"
                         }
                     }
                 },
@@ -323,6 +339,96 @@
                             "module": "tasks.ai.nvidia",
                             "class": "NvidiaRegister",
                             "results_dir": "results/nvidia"
+                        }
+                    }
+                }
+            }
+        },
+        "sms": {
+            "name": "短信任务",
+            "description": "短信接码服务",
+            "enabled": true,
+            "groups": {
+                "sms_api": {
+                    "name": "短信 API",
+                    "description": "短信接码API服务",
+                    "enabled": true,
+                    "tasks": {
+                        "sms.freeotpapi": {
+                            "name": "FreeOTP API",
+                            "description": "免费短信OTP API",
+                            "enabled": false,
+                            "module": "tasks.sms",
+                            "class": "FreeOtpApiTask",
+                            "results_dir": "results/freeotpapi"
+                        },
+                        "sms.otpgateway": {
+                            "name": "OTP Gateway",
+                            "description": "OTP Gateway 短信接码",
+                            "enabled": false,
+                            "module": "tasks.sms",
+                            "class": "OtpGatewayTask",
+                            "results_dir": "results/otpgateway"
+                        }
+                    }
+                }
+            }
+        },
+        "proxy": {
+            "name": "代理任务",
+            "description": "代理池管理和检测",
+            "enabled": true,
+            "groups": {
+                "proxy_pool": {
+                    "name": "代理池",
+                    "description": "代理池管理",
+                    "enabled": true,
+                    "tasks": {
+                        "proxy.pool": {
+                            "name": "Proxy Pool",
+                            "description": "代理池管理服务",
+                            "enabled": false,
+                            "module": "tasks.proxy",
+                            "class": "ProxyPoolTask",
+                            "results_dir": "results/proxy_pool"
+                        },
+                        "proxy.checker": {
+                            "name": "Proxy Checker",
+                            "description": "代理检测工具",
+                            "enabled": false,
+                            "module": "tasks.proxy",
+                            "class": "ProxyCheckerTask",
+                            "results_dir": "results/proxy_checker"
+                        }
+                    }
+                }
+            }
+        },
+        "captcha": {
+            "name": "验证码任务",
+            "description": "验证码识别服务",
+            "enabled": true,
+            "groups": {
+                "captcha_solver": {
+                    "name": "验证码识别",
+                    "description": "验证码识别服务",
+                    "enabled": true,
+                    "tasks": {
+                        "captcha.2captcha": {
+                            "name": "2Captcha",
+                            "description": "2Captcha 验证码识别",
+                            "enabled": false,
+                            "module": "tasks.captcha",
+                            "class": "TwoCaptchaTask",
+                            "results_dir": "results/2captcha"
+                        },
+                        "captcha.anticaptcha": {
+                            "name": "AntiCaptcha",
+                            "description": "AntiCaptcha 验证码识别",
+                            "enabled": false,
+                            "module": "tasks.captcha",
+                            "class": "AntiCaptchaTask",
+                            "results_dir": "results/anticaptcha"
                         }
                     }
                 }

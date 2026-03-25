@@ -9,6 +9,8 @@ from .onemail import OneSecMailProvider, OneSecMailTask
 from .tempmail_org import TempMailOrgProvider, TempMailOrgTask
 from .gmailnator import GmailnatorProvider, GmailnatorTask
 from .fakemail import FakeMailProvider, FakeMailTask
+from .fakemail_cloudflare import FakeMailCloudflareProvider, FakeMailCloudflareTask
+from .selfhosted import SelfHostedMailProvider, SelfHostedMailTask
 
 __all__ = [
     'MailTmProvider',
@@ -32,5 +34,9 @@ __all__ = [
     'GmailnatorProvider',
     'GmailnatorTask',
     'FakeMailProvider',
-    'FakeMailTask'
+    'FakeMailTask',
+    'FakeMailCloudflareProvider',
+    'FakeMailCloudflareTask',
+    'SelfHostedMailProvider',
+    'SelfHostedMailTask'
 ]

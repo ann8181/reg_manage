@@ -245,6 +245,30 @@
                             "module": "tasks.ai.replicate",
                             "class": "ReplicateRegister",
                             "results_dir": "results/replicate"
+                        },
+                        "ai.openrelay": {
+                            "name": "OpenRelay API",
+                            "description": "OpenRelay 免费AI模型聚合API",
+                            "enabled": false,
+                            "module": "tasks.ai.openrelay",
+                            "class": "OpenRelayTask",
+                            "results_dir": "results/openrelay"
+                        },
+                        "ai.freeapihub": {
+                            "name": "FreeApiHub",
+                            "description": "FreeApiHub 免费API聚合 (kimi/step/glm/qwen)",
+                            "enabled": false,
+                            "module": "tasks.ai.freeapihub",
+                            "class": "FreeApiHubTask",
+                            "results_dir": "results/freeapihub"
+                        },
+                        "ai.chat2api": {
+                            "name": "Chat2API",
+                            "description": "Chat2API 多模型免费API",
+                            "enabled": false,
+                            "module": "tasks.ai.chat2api",
+                            "class": "Chat2ApiTask",
+                            "results_dir": "results/chat2api"
                         }
                     }
                 },
@@ -339,6 +363,46 @@
                             "module": "tasks.ai.nvidia",
                             "class": "NvidiaRegister",
                             "results_dir": "results/nvidia"
+                        },
+                        "ai.kimi": {
+                            "name": "Kimi 注册",
+                            "description": "月之暗面 Kimi AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.kimi",
+                            "class": "KimiRegister",
+                            "results_dir": "results/kimi"
+                        },
+                        "ai.step": {
+                            "name": "Step 注册",
+                            "description": "阶跃星辰 Step AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.step",
+                            "class": "StepRegister",
+                            "results_dir": "results/step"
+                        },
+                        "ai.zhipuai": {
+                            "name": "智谱AI 注册",
+                            "description": "智谱AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.zhipuai",
+                            "class": "ZhipuaiRegister",
+                            "results_dir": "results/zhipuai"
+                        },
+                        "ai.minimax": {
+                            "name": "MiniMax 注册",
+                            "description": "MiniMax AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.minimax",
+                            "class": "MinimaxRegister",
+                            "results_dir": "results/minimax"
+                        },
+                        "ai.yuanbao": {
+                            "name": "腾讯元宝 注册",
+                            "description": "腾讯元宝 AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.yuanbao",
+                            "class": "YuanbaoRegister",
+                            "results_dir": "results/yuanbao"
                         }
                     }
                 }
@@ -399,6 +463,14 @@
                             "module": "tasks.proxy",
                             "class": "ProxyCheckerTask",
                             "results_dir": "results/proxy_checker"
+                        },
+                        "proxy.grabber": {
+                            "name": "Proxy Grabber",
+                            "description": "从公开源获取免费代理IP",
+                            "enabled": false,
+                            "module": "tasks.tools.proxy",
+                            "class": "ProxyGrabberTask",
+                            "results_dir": "results/proxy_grabber"
                         }
                     }
                 }

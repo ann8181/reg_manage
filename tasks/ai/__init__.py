@@ -21,6 +21,14 @@ from .mistral import MistralRegister
 from .groq import GroqRegister
 from .cohere import CohereRegister
 from .replicate import ReplicateRegister
+from .kimi import KimiRegister
+from .step import StepRegister
+from .zhipuai import ZhipuaiRegister
+from .minimax import MinimaxRegister
+from .yuanbao import YuanbaoRegister
+from .openrelay import OpenRelayTask
+from .freeapihub import FreeApiHubTask
+from .chat2api import Chat2ApiTask
 
 __all__ = [
     'GitHubRegister',
@@ -48,5 +56,13 @@ __all__ = [
     'MistralRegister',
     'GroqRegister',
     'CohereRegister',
-    'ReplicateRegister'
+    'ReplicateRegister',
+    'KimiRegister',
+    'StepRegister',
+    'ZhipuaiRegister',
+    'MinimaxRegister',
+    'YuanbaoRegister',
+    'OpenRelayTask',
+    'FreeApiHubTask',
+    'Chat2ApiTask'
 ]

@@ -132,6 +132,30 @@
         },
         "replicate": {
             "signup_url": "https://replicate.com"
+        },
+        "kimi": {
+            "signup_url": "https://kimi.moonshot.cn"
+        },
+        "step": {
+            "signup_url": "https://step.com"
+        },
+        "zhipuai": {
+            "signup_url": "https://open.bigmodel.cn"
+        },
+        "minimax": {
+            "signup_url": "https://www.minimax.io"
+        },
+        "yuanbao": {
+            "signup_url": "https://yuanbao.tencent.com"
+        },
+        "openrelay": {
+            "api_url": "https://openrelay.ai"
+        },
+        "freeapihub": {
+            "api_url": "https://api.free-api-hub.com"
+        },
+        "chat2api": {
+            "api_url": "https://api.chat2api.cn"
         }
     }
 }

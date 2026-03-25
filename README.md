@@ -22,6 +22,10 @@
 | email.guerrillamail | GuerrillaMail API | GuerrillaMail 临时邮箱 API |
 | email.getnada | GetNada API | GetNada 临时邮箱 API |
 | email.yopmail | YopMail API | YopMail 临时邮箱 API (仅收取) |
+| email.onemail | 1SecMail API | 1SecMail 临时邮箱 API (多域名) |
+| email.tempmailorg | TempMail.org API | TempMail.org 临时邮箱 API |
+| email.gmailnator | Gmailnator API | Gmailnator 临时 Gmail API |
+| email.fakemail | FakeMail API | FakeMail 临时邮箱 API (Cloudflare) |
 
 #### 真实邮箱注册 (real_email)
 
@@ -49,6 +53,12 @@
 | ai.aistudio | AI Studio 注册 | Google AI Studio 注册 |
 | ai.business_gemini | Business Gemini | Google Business Gemini 注册 |
 | ai.grok | Grok 注册 | xAI Grok 注册 |
+| ai.perplexity | Perplexity 注册 | Perplexity AI 注册 |
+| ai.deepseek | DeepSeek 注册 | DeepSeek AI 注册 |
+| ai.mistral | Mistral 注册 | Mistral AI 注册 |
+| ai.groq | Groq 注册 | Groq AI 注册 (免费API) |
+| ai.cohere | Cohere 注册 | Cohere AI 注册 |
+| ai.replicate | Replicate 注册 | Replicate AI 注册 |
 
 #### 编程 AI 工具 (coding_ai)
 
@@ -217,12 +227,22 @@ auto-register-tasks/
 │   │   ├── yopmail.py
 │   │   ├── outlook.py
 │   │   ├── gmail.py
-│   │   └── tempmail.py
+│   │   ├── tempmail.py
+│   │   ├── onemail.py      # 1SecMail
+│   │   ├── tempmail_org.py # TempMail.org
+│   │   ├── gmailnator.py   # Gmailnator
+│   │   └── fakemail.py     # FakeMail
 │   └── ai/                  # AI服务任务模块
 │       ├── github.py
 │       ├── claude.py
 │       ├── copilot.py
-│       └── ...
+│       ├── cursor.py
+│       ├── perplexity.py    # Perplexity
+│       ├── deepseek.py      # DeepSeek
+│       ├── mistral.py      # Mistral
+│       ├── groq.py         # Groq
+│       ├── cohere.py      # Cohere
+│       └── replicate.py    # Replicate
 ├── logs/                     # 日志目录
 ├── results/                  # 账户结果存储
 ├── config.json               # 全局配置
@@ -236,10 +256,12 @@ auto-register-tasks/
 本项目整合参考了以下开源工具：
 
 - [trae_outlook](https://github.com/your-repo/trae_outlook) - Outlook + Trae 账号注册
-- Mail.tm API
-- GuerrillaMail API
-- GetNada API
-- YopMail API
+- [tmpmail](https://github.com/sdushantha/tmpmail) - POSIX shell 临时邮箱 (4.2k stars)
+- [tempmail-python](https://github.com/cubicbyte/tempmail-python) - Python 临时邮箱库
+- [AccountGeneratorHelper](https://github.com/Dionis1902/AccountGeneratorHelper) - 账号生成综合库 (250 stars)
+- [Mailjs](https://github.com/cemalgnlts/Mailjs) - Node.js 邮件自动化
+- [fakemail](https://github.com/CH563/fakemail) - Cloudflare 临时邮箱 (221 stars)
+- Mail.tm API, GuerrillaMail API, GetNada API, YopMail API
 - 各种 AI 服务的官方注册流程
 
 ## 注意事项

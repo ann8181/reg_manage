@@ -41,6 +41,38 @@
                             "module": "tasks.email.yopmail",
                             "class": "YopMailProvider",
                             "results_dir": "results/yopmail"
+                        },
+                        "email.onemail": {
+                            "name": "1SecMail API",
+                            "description": "1SecMail 临时邮箱 API (多域名)",
+                            "enabled": false,
+                            "module": "tasks.email.onemail",
+                            "class": "OneSecMailTask",
+                            "results_dir": "results/onemail"
+                        },
+                        "email.tempmailorg": {
+                            "name": "TempMail.org API",
+                            "description": "TempMail.org 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.tempmail_org",
+                            "class": "TempMailOrgTask",
+                            "results_dir": "results/tempmailorg"
+                        },
+                        "email.gmailnator": {
+                            "name": "Gmailnator API",
+                            "description": "Gmailnator 临时 Gmail API",
+                            "enabled": false,
+                            "module": "tasks.email.gmailnator",
+                            "class": "GmailnatorTask",
+                            "results_dir": "results/gmailnator"
+                        },
+                        "email.fakemail": {
+                            "name": "FakeMail API",
+                            "description": "FakeMail 临时邮箱 API (Cloudflare)",
+                            "enabled": false,
+                            "module": "tasks.email.fakemail",
+                            "class": "FakeMailTask",
+                            "results_dir": "results/fakemail"
                         }
                     }
                 },
@@ -149,6 +181,54 @@
                             "module": "tasks.ai.grok",
                             "class": "GrokRegister",
                             "results_dir": "results/grok"
+                        },
+                        "ai.perplexity": {
+                            "name": "Perplexity 注册",
+                            "description": "Perplexity AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.perplexity",
+                            "class": "PerplexityRegister",
+                            "results_dir": "results/perplexity"
+                        },
+                        "ai.deepseek": {
+                            "name": "DeepSeek 注册",
+                            "description": "DeepSeek AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.deepseek",
+                            "class": "DeepSeekRegister",
+                            "results_dir": "results/deepseek"
+                        },
+                        "ai.mistral": {
+                            "name": "Mistral 注册",
+                            "description": "Mistral AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.mistral",
+                            "class": "MistralRegister",
+                            "results_dir": "results/mistral"
+                        },
+                        "ai.groq": {
+                            "name": "Groq 注册",
+                            "description": "Groq AI 注册 (免费API)",
+                            "enabled": false,
+                            "module": "tasks.ai.groq",
+                            "class": "GroqRegister",
+                            "results_dir": "results/groq"
+                        },
+                        "ai.cohere": {
+                            "name": "Cohere 注册",
+                            "description": "Cohere AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.cohere",
+                            "class": "CohereRegister",
+                            "results_dir": "results/cohere"
+                        },
+                        "ai.replicate": {
+                            "name": "Replicate 注册",
+                            "description": "Replicate AI 注册",
+                            "enabled": false,
+                            "module": "tasks.ai.replicate",
+                            "class": "ReplicateRegister",
+                            "results_dir": "results/replicate"
                         }
                     }
                 },

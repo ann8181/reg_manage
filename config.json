@@ -22,6 +22,18 @@
         },
         "yopmail": {
             "api_url": "https://api.yopmail.com"
+        },
+        "1secmail": {
+            "api_url": "https://www.1secmail.com"
+        },
+        "tempmailorg": {
+            "api_url": "https://temp-mail.org/en/api/v2"
+        },
+        "gmailnator": {
+            "api_url": "https://www.gmailnator.com/api/v1"
+        },
+        "fakemail": {
+            "api_url": "https://fakemail.top"
         }
     },
     "ai_services": {
@@ -75,6 +87,24 @@
         },
         "nvidia": {
             "signup_url": "https://ngc.nvidia.com"
+        },
+        "perplexity": {
+            "signup_url": "https://www.perplexity.ai"
+        },
+        "deepseek": {
+            "signup_url": "https://platform.deepseek.com"
+        },
+        "mistral": {
+            "signup_url": "https://mistral.ai"
+        },
+        "groq": {
+            "signup_url": "https://console.groq.com"
+        },
+        "cohere": {
+            "signup_url": "https://cohere.com"
+        },
+        "replicate": {
+            "signup_url": "https://replicate.com"
         }
     }
 }

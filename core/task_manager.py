@@ -27,6 +27,7 @@ class TaskManager:
     def __init__(self, config_path: str, global_config_path: str):
         self.config_path = config_path
         self.global_config = self._load_json(global_config_path)
+        self.tasks_config = self._load_json(config_path)
         self.categories: Dict[str, CategoryInfo] = {}
         self.all_tasks: Dict[str, TaskConfig] = {}
         self._load_tasks_config()
@@ -36,7 +37,7 @@ class TaskManager:
             return json.load(f)
     
     def _load_tasks_config(self):
-        tasks_config = self.global_config.get('categories', {})
+        tasks_config = self.tasks_config.get('categories', {})
         
         for cat_id, cat_data in tasks_config.items():
             groups = []

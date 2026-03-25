@@ -52,7 +52,7 @@
                         "email.outlook": {
                             "name": "Outlook 注册",
                             "description": "微软 Outlook 邮箱注册 + 邮件收取",
-                            "enabled": false,
+                            "enabled": true,
                             "module": "tasks.email.outlook",
                             "class": "OutlookRegister",
                             "results_dir": "results/outlook"

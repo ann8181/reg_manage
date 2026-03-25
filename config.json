@@ -6,6 +6,7 @@
     "concurrent_flows": 5,
     "max_tasks": 50,
     "results_base_dir": "results",
+    "logs_base_dir": "logs",
     "temp_email_provider": "temp-mail-asia",
     "temp_mail_awsl_url": "",
     "temp_mail_awsl_jwt": "",

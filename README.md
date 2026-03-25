@@ -8,6 +8,7 @@
 - 分层结构：Category -> Group -> Task 三层勾选
 - 灵活执行：支持按分类、组或单个任务执行
 - 账户管理：自动保存注册账户到结果文件
+- 日志系统：完整的运行日志、错误日志和截图功能
 
 ## 任务列表
 
@@ -155,6 +156,47 @@ results/
 └── ...
 ```
 
+## 日志系统
+
+### 日志目录结构
+
+```
+logs/
+├── global_20260325.log              # 全局日志
+├── email.outlook/
+│   ├── email.outlook_20260325.log  # 任务日志
+│   ├── results.jsonl                # 结果记录
+│   └── screenshots/                 # 截图目录
+│       ├── 01_signup_page.png
+│       ├── error_2026-03-25.png
+│       └── ...
+└── ai.github/
+    └── ...
+```
+
+### 日志级别
+
+| 级别 | 说明 |
+|------|------|
+| DEBUG | 调试信息 |
+| INFO | 运行信息 |
+| WARNING | 警告信息 |
+| ERROR | 错误信息 |
+| CRITICAL | 严重错误 |
+
+### 日志功能
+
+- **运行日志**：记录任务执行的每个步骤
+- **错误截图**：任务失败时自动截图
+- **结果记录**：保存到 `results.jsonl` 便于程序化处理
+- **分级输出**：同时输出到控制台和文件
+
+### 测试日志系统
+
+```bash
+python test_logger.py
+```
+
 ## 项目结构
 
 ```
@@ -165,7 +207,8 @@ auto-register-tasks/
 │   ├── __init__.py
 │   ├── base.py              # 基类定义
 │   ├── task_manager.py      # 任务管理器
-│   └── executor.py          # 执行器
+│   ├── executor.py          # 执行器
+│   └── logger.py            # 日志系统
 ├── tasks/
 │   ├── email/               # 邮箱任务模块
 │   │   ├── mailtm.py
@@ -180,9 +223,11 @@ auto-register-tasks/
 │       ├── claude.py
 │       ├── copilot.py
 │       └── ...
-├── results/                 # 账户结果存储
-├── config.json              # 全局配置
-├── main.py                  # 主入口
+├── logs/                     # 日志目录
+├── results/                  # 账户结果存储
+├── config.json               # 全局配置
+├── main.py                   # 主入口
+├── test_logger.py            # 日志测试脚本
 └── README.md
 ```
 

@@ -21,6 +21,7 @@ class OutlookRegister(BaseTask):
         self.browser_path = global_config.get("browser_path", "")
     
     def validate(self) -> bool:
+        self.logger.info("Validating task configuration")
         return True
     
     def _generate_email_username(self, length: int) -> str:
@@ -61,57 +62,77 @@ class OutlookRegister(BaseTask):
         email_username = self._generate_email_username(random.randint(12, 14))
         password = self._generate_strong_password(random.randint(11, 15))
 
+        self.logger.info(f"Starting Outlook registration for: {email_username}")
+        full_email = f"{email_username}@outlook.com"
+
         try:
             launch_opts = {'headless': True}
             if self.proxy:
                 launch_opts['proxy'] = self.proxy
+                self.logger.debug(f"Using proxy: {self.proxy}")
             if self.browser_path:
                 launch_opts['browser_path'] = self.browser_path
 
+            self.logger.info("Launching browser...")
             with Camoufox(**launch_opts) as browser:
-                page = browser.new_page()
-
+                self._page = browser.new_page()
+                
+                self.logger.info("Navigating to signup page...")
                 try:
-                    page.goto("https://signup.live.com/signup?mkt=EN-US&lc=1033", timeout=30000, wait_until="domcontentloaded")
-                    page.wait_for_load_state("domcontentloaded")
-                    page.wait_for_timeout(2000)
+                    self._page.goto("https://signup.live.com/signup?mkt=EN-US&lc=1033", timeout=30000, wait_until="domcontentloaded")
+                    self._page.wait_for_load_state("domcontentloaded")
+                    self._page.wait_for_timeout(2000)
+                    self.take_screenshot("01_signup_page")
 
-                    page.get_by_role("textbox", name="Email").wait_for(timeout=15000)
-                    page.get_by_role("textbox", name="Email").fill(email_username)
-                    page.get_by_text("Next").click()
-                    page.wait_for_timeout(3000)
+                    self.logger.info("Filling email field...")
+                    self._page.get_by_role("textbox", name="Email").wait_for(timeout=15000)
+                    self._page.get_by_role("textbox", name="Email").fill(email_username)
+                    self._page.get_by_text("Next").click()
+                    self._page.wait_for_timeout(3000)
+                    self.take_screenshot("02_email_filled")
                     
-                    page.locator('[type="password"]').wait_for(timeout=10000)
-                    page.locator('[type="password"]').fill(password)
-                    page.get_by_text("Next").click()
-                    page.wait_for_timeout(3000)
+                    self.logger.info("Filling password field...")
+                    self._page.locator('[type="password"]').wait_for(timeout=10000)
+                    self._page.locator('[type="password"]').fill(password)
+                    self._page.get_by_text("Next").click()
+                    self._page.wait_for_timeout(3000)
+                    self.take_screenshot("03_password_filled")
                     
-                    page.locator('[name="BirthYear"]').fill(year)
-                    page.locator('[name="BirthMonth"]').select_option(value=month)
-                    page.wait_for_timeout(500)
-                    page.locator('[name="BirthDay"]').select_option(value=day)
-                    page.wait_for_timeout(500)
-                    page.get_by_text("Next").click()
-                    page.wait_for_timeout(3000)
+                    self.logger.info("Filling birthdate...")
+                    self._page.locator('[name="BirthYear"]').fill(year)
+                    self._page.locator('[name="BirthMonth"]').select_option(value=month)
+                    self._page.wait_for_timeout(500)
+                    self._page.locator('[name="BirthDay"]').select_option(value=day)
+                    self._page.wait_for_timeout(500)
+                    self._page.get_by_text("Next").click()
+                    self._page.wait_for_timeout(3000)
+                    self.take_screenshot("04_birthdate_filled")
                     
-                    page.locator('#lastNameInput').fill(lastname)
-                    page.locator('#firstNameInput').fill(firstname)
-                    page.get_by_text("Next").click()
-                    page.wait_for_timeout(5000)
+                    self.logger.info("Filling name...")
+                    self._page.locator('#lastNameInput').fill(lastname)
+                    self._page.locator('#firstNameInput').fill(firstname)
+                    self._page.get_by_text("Next").click()
+                    self._page.wait_for_timeout(5000)
+                    self.take_screenshot("05_name_filled")
                     
                     try:
-                        page.wait_for_url(lambda url: "https://login.live.com/" in url or "https://outlook.live.com/" in url, timeout=30000)
+                        self._page.wait_for_url(lambda url: "https://login.live.com/" in url or "https://outlook.live.com/" in url, timeout=30000)
                     except:
-                        pass
+                        self.logger.warning("Page redirect timeout")
+                    
+                    self.take_screenshot("06_final_page")
 
                 except Exception as e:
+                    self.logger.error(f"Registration step failed: {str(e)}")
+                    self.take_error_screenshot("error_during_registration")
                     return TaskResult(
                         task_id=self.config.task_id,
                         status=TaskStatus.FAILED,
-                        error=f"Registration error: {str(e)}"
+                        error=f"Registration error: {str(e)}",
+                        screenshot_path=self.logger.screenshot_dir
                     )
 
-            full_email = f"{email_username}@outlook.com"
+            self.logger.info(f"Outlook registered successfully: {full_email}")
             self.save_account(full_email, password)
             
             return TaskResult(
@@ -122,11 +143,16 @@ class OutlookRegister(BaseTask):
             )
 
         except Exception as e:
+            self.logger.error(f"Outlook registration failed: {str(e)}", e)
+            self.take_error_screenshot("error_outlook_registration")
             return TaskResult(
                 task_id=self.config.task_id,
                 status=TaskStatus.FAILED,
-                error=str(e)
+                error=str(e),
+                screenshot_path=self.logger.screenshot_dir
             )
+        finally:
+            self.close_browser()
 
 
 class OutlookMailClient:

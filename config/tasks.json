@@ -89,6 +89,30 @@
                             "module": "tasks.email.selfhosted",
                             "class": "SelfHostedMailTask",
                             "results_dir": "results/selfhosted"
+                        },
+                        "email.mailsac": {
+                            "name": "Mailsac API",
+                            "description": "Mailsac 临时邮箱 API (需要API Key)",
+                            "enabled": false,
+                            "module": "tasks.email.mailsac",
+                            "class": "MailsacTask",
+                            "results_dir": "results/mailsac"
+                        },
+                        "email.temp-mail-asia": {
+                            "name": "Temp Mail Asia",
+                            "description": "Temp Mail Asia Web转API",
+                            "enabled": false,
+                            "module": "tasks.email.temp_mail_asia",
+                            "class": "TempMailAsiaTask",
+                            "results_dir": "results/temp-mail-asia"
+                        },
+                        "email.emailnator": {
+                            "name": "Emailnator API",
+                            "description": "Emailnator 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.emailnator",
+                            "class": "EmailnatorTask",
+                            "results_dir": "results/emailnator"
                         }
                     }
                 },

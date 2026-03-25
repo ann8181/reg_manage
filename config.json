@@ -40,6 +40,17 @@
         },
         "selfhosted": {
             "api_url": "http://localhost:8025"
+        },
+        "mailsac": {
+            "api_url": "https://mailsac.com/api",
+            "api_key": "",
+            "domain": "mailsac.com"
+        },
+        "temp-mail-asia": {
+            "api_url": "https://www.v3.temp-mail.asia"
+        },
+        "emailnator": {
+            "api_url": "https://emailnator.com"
         }
     },
     "sms_services": {

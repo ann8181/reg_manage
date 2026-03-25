@@ -1,0 +1,107 @@
+{
+    "api_providers": {
+        "mailtm": {
+            "name": "Mail.tm",
+            "api_url": "https://api.mail.tm",
+            "has_auth": true,
+            "rate_limit": "100/hour",
+            "reliability": "high",
+            "domains": ["mail.tm", "mailpie.me", "jnxlcm.com"]
+        },
+        "guerrillamail": {
+            "name": "Guerrilla Mail",
+            "api_url": "https://api.guerrillamail.com",
+            "has_auth": false,
+            "rate_limit": "unlimited",
+            "reliability": "high",
+            "domains": ["guerrillamail.com", "guerrillamailblock.com", "sharklasers.com", "grr.la"]
+        },
+        "getnada": {
+            "name": "GetNada",
+            "api_url": "https://getnada.com/api",
+            "has_auth": false,
+            "rate_limit": "100/hour",
+            "reliability": "medium",
+            "domains": ["getnada.com", "yopmail.com"]
+        },
+        "tempmailorg": {
+            "name": "TempMail.org",
+            "api_url": "https://api.tempmail.org",
+            "has_auth": false,
+            "rate_limit": "unlimited",
+            "reliability": "medium",
+            "domains": ["tempmail.org", "temp-mail.org"]
+        },
+        "mailsac": {
+            "name": "Mailsac",
+            "api_url": "https://mailsac.com/api",
+            "has_auth": true,
+            "rate_limit": "1000/day (free)",
+            "reliability": "high",
+            "domains": ["mailsac.com", "mailsac.net"],
+            "requires_api_key": true
+        },
+        "onemail": {
+            "name": "1SecMail",
+            "api_url": "https://www.1secmail.com/api/v1",
+            "has_auth": false,
+            "rate_limit": "unlimited",
+            "reliability": "high",
+            "domains": ["1secmail.com", "1secmail.org", "1secmail.net", "ezztt.com", "sfavisa.org"]
+        },
+        "fakemail": {
+            "name": "FakeMail",
+            "api_url": "https://fakemailapp.com/api",
+            "has_auth": false,
+            "rate_limit": "unlimited",
+            "reliability": "medium",
+            "domains": ["fakemailapp.com"]
+        },
+        "fakemailcloudflare": {
+            "name": "FakeMail Cloudflare",
+            "api_url": "https://fakemail.cloudflarekeeper.com/api",
+            "has_auth": false,
+            "rate_limit": "unlimited",
+            "reliability": "high",
+            "domains": ["fakemailcloudflare.com", "cloudflarekeeper.com"]
+        }
+    },
+    "web_providers": {
+        "temp-mail-asia": {
+            "name": "Temp Mail Asia",
+            "web_url": "https://www.v3.temp-mail.asia",
+            "converter": "httpx",
+            "api_endpoint": "/random-email",
+            "method": "POST",
+            "reliability": "medium"
+        },
+        "emailnator": {
+            "name": "Emailnator",
+            "web_url": "https://emailnator.com",
+            "converter": "httpx",
+            "api_endpoint": "/generate-email",
+            "method": "POST",
+            "reliability": "high"
+        },
+        "gmailnator": {
+            "name": "Gmailnator",
+            "web_url": "https://www.gmailnator.com",
+            "converter": "httpx",
+            "api_endpoint": "/mailbox/mailbox",
+            "method": "POST",
+            "reliability": "medium"
+        },
+        "mailcatch": {
+            "name": "MailCatch",
+            "web_url": "https://mailcatch.com",
+            "converter": "browser",
+            "reliability": "low"
+        },
+        "mohmal": {
+            "name": "Mohmal",
+            "web_url": "https://mohmal.com",
+            "converter": "browser",
+            "reliability": "medium"
+        }
+    }
+}

@@ -1,4 +1,5 @@
 import time
+import random
 import httpx
 from typing import List, Tuple, Dict, Optional
 from core.base import TempMailProvider, TaskConfig, BaseTask, TaskResult, TaskStatus
@@ -114,9 +115,6 @@ class OneSecMailProvider(TempMailProvider):
     
     def close(self):
         self.client.close()
-
-
-import random
 
 
 class OneSecMailTask(BaseTask):

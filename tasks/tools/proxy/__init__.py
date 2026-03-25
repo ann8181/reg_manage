@@ -1,3 +1,4 @@
+import os
 import time
 import httpx
 from typing import List, Dict
@@ -26,7 +27,7 @@ class ProxyGrabberProvider:
                     if line and ":" in line:
                         proxies.append(line)
         except Exception as e:
-            print(f"[ProxyGrabber] Grab from {url} error: {e}")
+            print("[ProxyGrabber] Grab from " + url + " error: " + str(e))
         return proxies
     
     def grab_all(self) -> List[str]:
@@ -54,16 +55,16 @@ class ProxyGrabberTask(BaseTask):
             self.provider = ProxyGrabberProvider()
             proxies = self.provider.grab_all()
             
-            self.logger.info(f"ProxyGrabber: grabbed {len(proxies)} proxies")
+            self.logger.info("ProxyGrabber: grabbed " + str(len(proxies)) + " proxies")
             
             if proxies:
-                sample_file = f"{self.results_dir}/proxies.txt"
+                sample_file = self.results_dir + "/proxies.txt"
                 os.makedirs(self.results_dir, exist_ok=True)
                 with open(sample_file, "w") as f:
                     f.write("\n".join(proxies[:100]))
                 
                 self.save_account(
-                    f"{len(proxies)}_proxies",
+                    str(len(proxies)) + "_proxies",
                     "",
                     count=str(len(proxies)),
                     sample_file=sample_file
@@ -72,12 +73,12 @@ class ProxyGrabberTask(BaseTask):
             return TaskResult(
                 task_id=self.config.task_id,
                 status=TaskStatus.SUCCESS,
-                message=f"ProxyGrabber: grabbed {len(proxies)} proxies",
+                message="ProxyGrabber: grabbed " + str(len(proxies)) + " proxies",
                 data={"proxy_count": len(proxies)}
             )
             
         except Exception as e:
-            self.logger.error(f"ProxyGrabber error: {str(e)}", e)
+            self.logger.error("ProxyGrabber error: " + str(e), e)
             return TaskResult(
                 task_id=self.config.task_id,
                 status=TaskStatus.FAILED,

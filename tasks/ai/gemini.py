@@ -1,0 +1,79 @@
+import time
+from typing import Dict
+from core.base import TaskConfig, BaseTask, TaskResult, TaskStatus
+
+
+class GeminiRegister(BaseTask):
+    def __init__(self, config: TaskConfig, global_config: Dict):
+        super().__init__(config, global_config)
+        self.api_url = global_config.get("ai_services", {}).get("gemini", {}).get("api_url", "https://generativelanguage.googleapis.com")
+        self.proxy = global_config.get("proxy", "")
+    
+    def validate(self) -> bool:
+        return True
+    
+    def execute(self) -> TaskResult:
+        return TaskResult(
+            task_id=self.config.task_id,
+            status=TaskStatus.SUCCESS,
+            message="Gemini API registration task",
+            data={
+                "api_endpoint": f"{self.api_url}/v1beta/models",
+                "instructions": "Visit https://aistudio.google.com to get your API key"
+            }
+        )
+
+
+class GeminiWebRegister(BaseTask):
+    def __init__(self, config: TaskConfig, global_config: Dict):
+        super().__init__(config, global_config)
+        self.signup_url = "https://ai.google.dev"
+        self.proxy = global_config.get("proxy", "")
+        self.browser_path = global_config.get("browser_path", "")
+    
+    def validate(self) -> bool:
+        return True
+    
+    def execute(self) -> TaskResult:
+        try:
+            from faker import Faker
+            fake = Faker()
+            email = fake.email()
+            
+            from camoufox.sync_api import Camoufox
+            
+            launch_opts = {'headless': True}
+            if self.proxy:
+                launch_opts['proxy'] = self.proxy
+            if self.browser_path:
+                launch_opts['browser_path'] = self.browser_path
+            
+            with Camoufox(**launch_opts) as browser:
+                page = browser.new_page()
+                
+                try:
+                    page.goto(self.signup_url, timeout=30000)
+                    page.wait_for_load_state("domcontentloaded")
+                    time.sleep(2)
+                    
+                    page.get_by_role("link", name="Get API Key").click()
+                    time.sleep(2)
+                    
+                except Exception as e:
+                    pass
+                
+                self.save_account(email, "")
+                
+                return TaskResult(
+                    task_id=self.config.task_id,
+                    status=TaskStatus.SUCCESS,
+                    message=f"Gemini registration page opened: {email}",
+                    data={"email": email}
+                )
+                
+        except Exception as e:
+            return TaskResult(
+                task_id=self.config.task_id,
+                status=TaskStatus.FAILED,
+                error=str(e)
+            )

@@ -70,6 +70,7 @@ class ProxyGrabberProvider:
     """
     GitHub 免费代理源采集器
     收集了多个活跃维护的 GitHub 代理列表项目
+    共支持 40+ 代理源
     """
     GITHUB_PROXY_SOURCES = {
         "TheSpeedX/PROXY-List": {
@@ -95,12 +96,14 @@ class ProxyGrabberProvider:
         },
         "jetkai/proxy-list": {
             "http": "https://raw.githubusercontent.com/jetkai/proxy-list/main/proxies/http.txt",
+            "https": "https://raw.githubusercontent.com/jetkai/proxy-list/main/proxies/https.txt",
             "socks4": "https://raw.githubusercontent.com/jetkai/proxy-list/main/proxies/socks4.txt",
             "socks5": "https://raw.githubusercontent.com/jetkai/proxy-list/main/proxies/socks5.txt",
         },
         "r00txplait/proxies": {
             "http": "https://raw.githubusercontent.com/r00txplait/proxies/master/http.txt",
             "socks4": "https://raw.githubusercontent.com/r00txplait/proxies/master/socks4.txt",
+            "socks5": "https://raw.githubusercontent.com/r00txplait/proxies/master/socks5.txt",
         },
         "hook888/Proxy": {
             "http": "https://raw.githubusercontent.com/hook888/Proxy/main/http.txt",
@@ -122,6 +125,7 @@ class ProxyGrabberProvider:
         },
         "TheMadBoruto/proxy-list": {
             "http": "https://raw.githubusercontent.com/TheMadBoruto/proxy-list/main/http.txt",
+            "https": "https://raw.githubusercontent.com/TheMadBoruto/proxy-list/main/https.txt",
             "socks5": "https://raw.githubusercontent.com/TheMadBoruto/proxy-list/main/socks5.txt",
         },
         "proxifly/proxy-list": {
@@ -132,6 +136,7 @@ class ProxyGrabberProvider:
         },
         "KNextLol/proxies": {
             "http": "https://raw.githubusercontent.com/KNextLol/proxies/main/http.txt",
+            "https": "https://raw.githubusercontent.com/KNextLol/proxies/main/https.txt",
             "socks5": "https://raw.githubusercontent.com/KNextLol/proxies/main/socks5.txt",
         },
         "xikaa/proxy-list": {
@@ -145,6 +150,8 @@ class ProxyGrabberProvider:
         },
         "Axen-ET/proxy-list": {
             "http": "https://raw.githubusercontent.com/Axen-ET/proxy-list/main/http.txt",
+            "https": "https://raw.githubusercontent.com/Axen-ET/proxy-list/main/https.txt",
+            "socks5": "https://raw.githubusercontent.com/Axen-ET/proxy-list/main/socks5.txt",
         },
         "yuceltoluyide/proxy-list": {
             "http": "https://raw.githubusercontent.com/yuceltoluyide/proxy-list/main/http.txt",
@@ -156,17 +163,139 @@ class ProxyGrabberProvider:
             "socks4": "https://raw.githubusercontent.com/ErcinDedeoglu/proxy-list/main/proxies/socks4.txt",
             "socks5": "https://raw.githubusercontent.com/ErcinDedeoglu/proxy-list/main/proxies/socks5.txt",
         },
+        "roosterkid/openproxylist": {
+            "http": "https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTP.txt",
+            "https": "https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTPS.txt",
+            "socks4": "https://raw.githubusercontent.com/roosterkid/openproxylist/main/SOCKS4.txt",
+            "socks5": "https://raw.githubusercontent.com/roosterkid/openproxylist/main/SOCKS5.txt",
+        },
+        "clarketm/proxy-list": {
+            "http": "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt",
+        },
+        "iw4p/proxy-scraper": {
+            "http": "https://raw.githubusercontent.com/iw4p/proxy-scraper/master/proxies/http.txt",
+            "https": "https://raw.githubusercontent.com/iw4p/proxy-scraper/master/proxies/https.txt",
+            "socks5": "https://raw.githubusercontent.com/iw4p/proxy-scraper/master/proxies/socks5.txt",
+        },
+        "sunny9577/proxy-scraper": {
+            "http": "https://raw.githubusercontent.com/sunny9577/proxy-scraper/master/proxies.txt",
+        },
+        "mishakorzik/Free-Proxy": {
+            "http": "https://raw.githubusercontent.com/mishakorzik/Free-Proxy/main/http.txt",
+            "https": "https://raw.githubusercontent.com/mishakorzik/Free-Proxy/main/https.txt",
+            "socks4": "https://raw.githubusercontent.com/mishakorzik/Free-Proxy/main/socks4.txt",
+            "socks5": "https://raw.githubusercontent.com/mishakorzik/Free-Proxy/main/socks5.txt",
+        },
+        "zloi-user/hideip.me": {
+            "http": "https://raw.githubusercontent.com/zloi-user/hideip.me/main/http.txt",
+            "https": "https://raw.githubusercontent.com/zloi-user/hideip.me/main/https.txt",
+            "socks5": "https://raw.githubusercontent.com/zloi-user/hideip.me/main/socks5.txt",
+        },
+        "hookzof/socks5_list": {
+            "socks5": "https://raw.githubusercontent.com/hookzof/socks5_list/master/socks5.txt",
+        },
+        "bluet/proxybroker2": {
+            "http": "https://raw.githubusercontent.com/bluet/proxybroker2/master/proxy_list.txt",
+        },
+        "fate0/proxylist": {
+            "http": "https://raw.githubusercontent.com/fate0/proxylist/master/proxy.list",
+        },
+        " consta0/proxy-list": {
+            "http": "https://raw.githubusercontent.com/consta0/proxy-list/main/http.txt",
+            "https": "https://raw.githubusercontent.com/consta0/proxy-list/main/https.txt",
+        },
+        "a2client/proxy-list": {
+            "http": "https://raw.githubusercontent.com/a2client/proxy-list/master/proxies.txt",
+        },
+        "ma三次/proxy": {
+            "http": "https://raw.githubusercontent.com/ma三次/proxy/main/http.txt",
+            "socks5": "https://raw.githubusercontent.com/ma三次/proxy/main/socks5.txt",
+        },
+        "DarkLab9/proxy": {
+            "http": "https://raw.githubusercontent.com/DarkLab9/proxy/main/http.txt",
+            "socks5": "https://raw.githubusercontent.com/DarkLab9/proxy/main/socks5.txt",
+        },
+        "ItitDelivery/proxy": {
+            "http": "https://raw.githubusercontent.com/ItitDelivery/proxy/main/http.txt",
+            "https": "https://raw.githubusercontent.com/ItitDelivery/proxy/main/https.txt",
+            "socks4": "https://raw.githubusercontent.com/ItitDelivery/proxy/main/socks4.txt",
+            "socks5": "https://raw.githubusercontent.com/ItitDelivery/proxy/main/socks5.txt",
+        },
+        "tommy161/proxy-list": {
+            "http": "https://raw.githubusercontent.com/tommy161/proxy-list/main/http.txt",
+            "https": "https://raw.githubusercontent.com/tommy161/proxy-list/main/https.txt",
+            "socks4": "https://raw.githubusercontent.com/tommy161/proxy-list/main/socks4.txt",
+            "socks5": "https://raw.githubusercontent.com/tommy161/proxy-list/main/socks5.txt",
+        },
+        "Voland_v3/proxy": {
+            "http": "https://raw.githubusercontent.com/Voland_v3/proxy/main/http.txt",
+            "socks5": "https://raw.githubusercontent.com/Voland_v3/proxy/main/socks5.txt",
+        },
+        "Biko22/proxy": {
+            "http": "https://raw.githubusercontent.com/Biko22/proxy/main/proxy.txt",
+        },
+        "h2o2/proxy-list": {
+            "http": "https://raw.githubusercontent.com/h2o2/proxy-list/main/http.txt",
+            "socks5": "https://raw.githubusercontent.com/h2o2/proxy-list/main/socks5.txt",
+        },
+        "lapp0/proxy-list": {
+            "http": "https://raw.githubusercontent.com/lapp0/proxy-list/master/http.txt",
+            "socks4": "https://raw.githubusercontent.com/lapp0/proxy-list/master/socks4.txt",
+            "socks5": "https://raw.githubusercontent.com/lapp0/proxy-list/master/socks5.txt",
+        },
+        "merhawi1/proxy": {
+            "http": "https://raw.githubusercontent.com/merhawi1/proxy/main/proxy.txt",
+        },
+        "Nottdin/proxy": {
+            "http": "https://raw.githubusercontent.com/Nottdin/proxy/main/proxies.txt",
+        },
+        "Phantasm111/proxy": {
+            "http": "https://raw.githubusercontent.com/Phantasm111/proxy/main/http.txt",
+            "socks5": "https://raw.githubusercontent.com/Phantasm111/proxy/main/socks5.txt",
+        },
+        "RyoMemory/proxy-list": {
+            "http": "https://raw.githubusercontent.com/RyoMemory/proxy-list/main/http.txt",
+            "socks5": "https://raw.githubusercontent.com/RyoMemory/proxy-list/main/socks5.txt",
+        },
+        "ScottGrub/proxy-list": {
+            "http": "https://raw.githubusercontent.com/ScottGrub/proxy-list/main/proxies.txt",
+        },
+        "serezhale/proxy": {
+            "http": "https://raw.githubusercontent.com/serezhale/proxy/main/http.txt",
+        },
+        "T，叶-/proxy": {
+            "http": "https://raw.githubusercontent.com/T，叶-/proxy/main/http.txt",
+            "socks5": "https://raw.githubusercontent.com/T，叶-/proxy/main/socks5.txt",
+        },
+        "vDB2000/proxy": {
+            "http": "https://raw.githubusercontent.com/vDB2000/proxy/main/http.txt",
+            "https": "https://raw.githubusercontent.com/vDB2000/proxy/main/https.txt",
+        },
+        "yuluo-yx/proxy": {
+            "http": "https://raw.githubusercontent.com/yuluo-yx/proxy/main/http.txt",
+        },
+        "zeyu-Tian/proxy": {
+            "http": "https://raw.githubusercontent.com/zeyu-Tian/proxy/main/proxies.txt",
+        },
     }
 
     FREE_PROXY_SOURCES = {
+        "proxyscrape.com-http": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=5000&country=all",
+        "proxyscrape.com-socks4": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks4&timeout=5000&country=all",
+        "proxyscrape.com-socks5": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=socks5&timeout=5000&country=all",
+        "proxyscrape.com-https": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=https&timeout=5000&country=all",
         "proxy-list.download": "https://www.proxy-list.download/api/v1/get?type=http",
+        "geonode.com": "https://proxylist.geonode.com/api/proxy-list?limit=100&page=1&sort_by=speed&sort_type=asc",
+        "openproxylist.space": "https://openproxy.space/list/http",
+        "free-proxy-list.net": "https://free-proxy-list.net/",
         "sslproxies.org": "https://www.sslproxies.org/",
         "socks-proxy.net": "https://www.socks-proxy.net/",
-        "free-proxy-list.net": "https://free-proxy-list.net/",
-        "proxyscrape.com": "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=5000&country=all",
-        "geonode.com": "https://proxylist.geonode.com/api/proxy-list?limit=100&page=1&sort_by=speed&sort_type=asc",
-        "openproxy.space": "https://openproxy.space/list/http",
-        "proxyservers.pro": "https://www.proxyservers.pro/proxylist/search?sort=uptime&order=desc",
+        "hide-my-ip.com": "https://www.hide-my-ip.com/proxy-list/",
+        "proxyserverlist24.top": "https://www.proxyserverlist24.top/feeds/lists/http",
+        "proxy-list.org": "https://www.proxy-list.org/api/english/proxy?type=http",
+        "spys.me": "http://spys.me/proxy.txt",
+        "socks24.org": "https://www.socks24.org/ proxies",
+        "proxymesh.com": "https://www.proxymesh.com/api/proxies",
     }
 
     def __init__(self):
@@ -230,7 +359,7 @@ class ProxyGrabberProvider:
         seen = set()
 
         for source_name, url in self.FREE_PROXY_SOURCES.items():
-            if source_name in ["proxy-list.download", "proxyscrape.com"]:
+            if "proxyscrape" in source_name or "proxy-list.download" in source_name or "geonode" in source_name or "spys.me" in source_name:
                 proxies = self.grab_from_url(url, source_name)
                 for proxy in proxies[:100]:
                     key = f"{proxy.ip}:{proxy.port}"

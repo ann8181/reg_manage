@@ -64,6 +64,24 @@
     "proxy_services": {
         "pool": {
             "api_url": "http://localhost:8080"
+        },
+        "db_path": "results/proxies.db",
+        "grabber": {
+            "enabled": true,
+            "github_sources": 18,
+            "public_sources": 7,
+            "max_per_source": 50
+        },
+        "validator": {
+            "max_concurrent": 50,
+            "timeout": 10,
+            "test_urls": [
+                "https://httpbin.org/ip",
+                "https://api.ipify.org?format=json"
+            ]
+        },
+        "cache": {
+            "ttl_minutes": 30
         }
     },
     "captcha_services": {

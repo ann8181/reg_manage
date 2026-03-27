@@ -527,6 +527,14 @@
                             "module": "tasks.tools.proxy",
                             "class": "ProxyGrabberTask",
                             "results_dir": "results/proxy_grabber"
+                        },
+                        "proxy.manager": {
+                            "name": "Proxy Manager",
+                            "description": "统一代理管理 - 采集/验证/存储/调用",
+                            "enabled": true,
+                            "module": "tasks.tools.proxy",
+                            "class": "ProxyManagerTask",
+                            "results_dir": "results/proxy_manager"
                         }
                     }
                 }

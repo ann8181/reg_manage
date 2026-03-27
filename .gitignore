@@ -26,3 +26,5 @@ ENV/
 Thumbs.db
 data/
 data_persona_test/
+results/
+*.db

@@ -158,9 +158,16 @@ class PersonaSystem:
     def select_identity_for_service(
         self,
         service: str,
-        strategy: SelectionStrategy = "isolation"
+        strategy: SelectionStrategy = "isolation",
+        identity_id: Optional[str] = None,
+        regenerate: bool = False
     ) -> Optional[Dict]:
-        return self.selector.select_identity(service=service, strategy=strategy)
+        return self.selector.select_identity(
+            service=service, 
+            strategy=strategy,
+            identity_id=identity_id,
+            regenerate=regenerate
+        )
     
     def create_task_context(
         self,
@@ -241,5 +248,7 @@ __all__ = [
     "SelectionStrategy",
     "JSONDatabase",
     "MultiDatabase",
-    "create_persona_system"
+    "create_persona_system",
+    "PersonaLite",
+    "create_persona"
 ]

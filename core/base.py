@@ -192,3 +192,159 @@ class EmailProvider(ABC):
 
 class TempMailProvider(EmailProvider):
     pass
+
+
+class IntegratedBaseTask(BaseTask):
+    """
+    集成Persona系统的任务基类
+    自动使用Persona身份、代理池和统一账号存储
+    """
+    
+    _persona_system = None
+    
+    def __init__(self, config: TaskConfig, global_config: Dict[str, Any]):
+        super().__init__(config, global_config)
+        self._identity = None
+        self._proxy = None
+        self._persona_initialized = False
+    
+    @classmethod
+    def init_persona(cls, data_dir: str = "data/persona"):
+        """初始化Persona系统"""
+        if cls._persona_system is None:
+            from persona_system import create_persona_system
+            cls._persona_system = create_persona_system(data_dir)
+            cls._persona_initialized = True
+        return cls._persona_system
+    
+    @classmethod
+    def get_persona_system(cls):
+        """获取Persona系统单例"""
+        if cls._persona_system is None:
+            return cls.init_persona()
+        return cls._persona_system
+    
+    def get_identity(self, service: Optional[str] = None) -> Optional[Dict]:
+        """获取Persona身份"""
+        if self._identity is None:
+            ps = self.get_persona_system()
+            self._identity = ps.select_identity_for_service(service=service, strategy="isolation")
+        return self._identity
+    
+    def get_proxy(self, country: Optional[str] = None) -> Optional[Dict]:
+        """获取Persona代理"""
+        if self._proxy is None:
+            ps = self.get_persona_system()
+            identity = self.get_identity()
+            identity_country = None
+            if identity:
+                identity_country = identity.get("profile", {}).get("location", {}).get("country")
+            self._proxy = ps.get_proxy(country=country or identity_country)
+        return self._proxy
+    
+    def auto_setup(self, service: str) -> Dict:
+        """自动准备身份和代理"""
+        ps = self.get_persona_system()
+        setup = ps.auto_setup(service)
+        self._identity = setup.get("identity")
+        self._proxy = setup.get("proxy")
+        return setup
+    
+    def save_account_to_persona(
+        self,
+        service: str,
+        email: str,
+        password: str,
+        username: Optional[str] = None,
+        **extra_data
+    ) -> Dict:
+        """保存账号到Persona统一存储"""
+        ps = self.get_persona_system()
+        identity_id = None
+        if self._identity:
+            identity_id = self._identity.get("id")
+        return ps.register_account(
+            service=service,
+            email=email,
+            password=password,
+            username=username,
+            identity_id=identity_id,
+            extra_data=extra_data
+        )
+    
+    def save_account(self, email: str, password: str, **extra_data):
+        """
+        保存账号 - 优先使用Persona存储，同时兼容旧的txt存储
+        """
+        service_name = self._extract_service_name()
+        
+        try:
+            self.save_account_to_persona(
+                service=service_name,
+                email=email,
+                password=password,
+                **extra_data
+            )
+        except Exception as e:
+            self.logger.warning(f"Failed to save to Persona: {e}, falling back to txt")
+            self._save_account_txt(email, password, **extra_data)
+    
+    def _save_account_txt(self, email: str, password: str, **extra_data):
+        """旧的txt存储方式（保留兼容）"""
+        write_header = not os.path.exists(self.result_file) or os.path.getsize(self.result_file) == 0
+        with open(self.result_file, "a", encoding="utf-8") as f:
+            if write_header:
+                headers = ["Email", "Password"]
+                for key in extra_data.keys():
+                    headers.append(key)
+                f.write("\t".join(headers) + "\n")
+            
+            values = [email, password]
+            for value in extra_data.values():
+                values.append(str(value))
+            f.write("\t".join(values) + "\n")
+    
+    def _extract_service_name(self) -> str:
+        """从task_id提取服务名"""
+        parts = self.config.task_id.split(".")
+        if len(parts) >= 2:
+            return parts[1]
+        return self.config.task_id
+    
+    def get_browser(self):
+        """
+        获取浏览器 - 自动使用Persona代理
+        """
+        if self._browser is None:
+            from camoufox.sync_api import Camoufox
+            launch_opts = {'headless': True}
+            
+            persona_proxy = self._proxy or self.get_proxy()
+            if persona_proxy:
+                proxy_host = persona_proxy.get("proxy", {}).get("host")
+                proxy_port = persona_proxy.get("proxy", {}).get("port")
+                proxy_protocol = persona_proxy.get("proxy", {}).get("protocol", "http")
+                if proxy_host:
+                    proxy_auth = persona_proxy.get("proxy", {}).get("auth")
+                    if proxy_auth:
+                        proxy_url = f"{proxy_protocol}://{proxy_auth.get('username')}:{proxy_auth.get('password')}@{proxy_host}:{proxy_port}"
+                    else:
+                        proxy_url = f"{proxy_protocol}://{proxy_host}:{proxy_port}"
+                    launch_opts['proxy'] = proxy_url
+            
+            global_proxy = self.global_config.get('proxy', '')
+            if global_proxy and not persona_proxy:
+                launch_opts['proxy'] = global_proxy
+            
+            browser_path = self.global_config.get('browser_path', '')
+            if browser_path:
+                launch_opts['browser_path'] = browser_path
+            
+            self._browser = Camoufox(**launch_opts)
+        return self._browser
+    
+    def close_browser(self):
+        """关闭浏览器"""
+        super().close_browser()
+        self._identity = None
+        self._proxy = None

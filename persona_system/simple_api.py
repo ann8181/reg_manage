@@ -10,7 +10,7 @@ import uuid
 from .generator import IdentityGenerator
 from .fingerprint import FingerprintGenerator
 from .quality import IdentityQualityScorer
-from .database import JSONDatabase, Credential加密
+from .database import JSONDatabase, CredentialVault
 from .selector import TaskContext
 
 
@@ -30,7 +30,7 @@ class PersonaLite:
         self.generator = IdentityGenerator()
         self.fingerprint_gen = FingerprintGenerator()
         self.quality_scorer = IdentityQualityScorer()
-        self._crypto = Credential加密()
+        self._crypto = CredentialVault()
         
         self._init_default_proxies()
     

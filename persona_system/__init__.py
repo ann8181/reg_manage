@@ -3,7 +3,7 @@ import json
 from typing import Optional, Dict, List
 from datetime import datetime
 
-from .database import JSONDatabase, MultiDatabase
+from .database import JSONDatabase, MultiDatabase, CredentialVault
 from .generator import IdentityGenerator
 from .fingerprint import FingerprintGenerator
 from .quality import IdentityQualityScorer, ProxyQualityChecker
@@ -72,6 +72,23 @@ class PersonaSystem:
     def get_identity(self, identity_id: str) -> Optional[Dict]:
         return self.identities_db.get_by_id(identity_id)
     
+    def get_proxy(self, country: Optional[str] = None) -> Optional[Dict]:
+        """获取可用代理"""
+        return self.proxy_manager.get_best_proxy(country=country, min_score=0)
+    
+    def auto_setup(self, service: str) -> Dict:
+        """自动准备身份和代理"""
+        identity = self.select_identity_for_service(service)
+        country = None
+        if identity:
+            country = identity.get("profile", {}).get("location", {}).get("country")
+        proxy = self.get_proxy(country=country)
+        return {
+            "identity": identity,
+            "proxy": proxy,
+            "ready": True
+        }
+    
     def get_active_identities(self) -> List[Dict]:
         all_identities = self.identities_db.get_all()
         return [i for i in all_identities if i.get("status") == "active"]
@@ -119,8 +136,66 @@ class PersonaSystem:
             metadata=metadata
         )
     
+    def register_account(
+        self,
+        service: str,
+        email: str,
+        password: str,
+        username: Optional[str] = None,
+        identity_id: Optional[str] = None,
+        extra_data: Optional[Dict] = None,
+        encrypt_password: bool = True
+    ) -> Dict:
+        """简化版注册账号"""
+        service_info = {
+            "name": service,
+            "display_name": service.upper(),
+            "category": self._get_service_category(service)
+        }
+        
+        from .database import CredentialVault
+        crypto = CredentialVault()
+        encrypted_password = crypto.encrypt(password) if encrypt_password else password
+        
+        credentials = {
+            "email": email,
+            "password": encrypted_password,
+            "username": username or "",
+            "phone": ""
+        }
+        
+        return self.account_manager.create_account(
+            identity_id=identity_id or "",
+            service=service_info,
+            credentials=credentials,
+            metadata=extra_data or {}
+        )
+    
+    def _get_service_category(self, service: str) -> str:
+        categories = {
+            "github": "ai", "claude": "ai", "gpt": "ai", "gemini": "ai",
+            "cursor": "ai", "copilot": "ai", "deepseek": "ai",
+            "twitter": "social", "facebook": "social", "instagram": "social",
+            "gmail": "email", "outlook": "email", "proton": "email"
+        }
+        return categories.get(service.lower(), "other")
+    
     def get_account(self, account_id: str) -> Optional[Dict]:
         return self.account_manager.get_account(account_id)
+    
+    def get_account_decrypted(self, service: str) -> Optional[Dict]:
+        """获取账号并解密密码"""
+        account = self.account_manager.get_available_account(service)
+        if account:
+            encrypted_pw = account.get("credentials", {}).get("password", "")
+            if encrypted_pw and encrypted_pw.startswith("gA"):
+                try:
+                    crypto = CredentialVault()
+                    decrypted = crypto.decrypt(encrypted_pw)
+                    account["credentials"]["password"] = decrypted
+                except Exception:
+                    pass
+        return account
     
     def get_accounts_by_service(self, service_name: str) -> List[Dict]:
         return self.account_manager.get_accounts_by_service(service_name)

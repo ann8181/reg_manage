@@ -214,7 +214,7 @@ class MultiDatabase:
                 shutil.copy2(backup_file, db.file_path)
 
 
-class Credential加密:
+class CredentialVault:
     _instance = None
     
     def __new__(cls):

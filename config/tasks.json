@@ -113,6 +113,30 @@
                             "module": "tasks.email.emailnator",
                             "class": "EmailnatorTask",
                             "results_dir": "results/emailnator"
+                        },
+                        "email.inboxkitten": {
+                            "name": "InboxKitten API",
+                            "description": "InboxKitten 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.inboxkitten",
+                            "class": "InboxKitten",
+                            "results_dir": "results/inboxkitten"
+                        },
+                        "email.tempmailplus": {
+                            "name": "TempMail Plus API",
+                            "description": "TempMail Plus 临时邮箱 API (多域名)",
+                            "enabled": false,
+                            "module": "tasks.email.tempmail_plus",
+                            "class": "TempMailPlus",
+                            "results_dir": "results/tempmailplus"
+                        },
+                        "email.tempmaillol": {
+                            "name": "TempMail.lol API",
+                            "description": "TempMail.lol 临时邮箱 API",
+                            "enabled": false,
+                            "module": "tasks.email.tempmail_lol",
+                            "class": "TempMailLol",
+                            "results_dir": "results/tempmaillol"
                         }
                     }
                 },
@@ -457,6 +481,14 @@
                             "module": "tasks.sms",
                             "class": "OtpGatewayTask",
                             "results_dir": "results/otpgateway"
+                        },
+                        "sms.receivesms": {
+                            "name": "ReceiveSMS Free",
+                            "description": "ReceiveSMS 免费短信接码 (多国家)",
+                            "enabled": false,
+                            "module": "tasks.sms.receive_sms",
+                            "class": "ReceiveSmsFreeTask",
+                            "results_dir": "results/receivesms"
                         }
                     }
                 }
@@ -525,6 +557,51 @@
                             "module": "tasks.captcha",
                             "class": "AntiCaptchaTask",
                             "results_dir": "results/anticaptcha"
+                        },
+                        "captcha.optiic": {
+                            "name": "Optiic Captcha",
+                            "description": "Optiic 免费文字验证码识别 (需API Key)",
+                            "enabled": false,
+                            "module": "tasks.captcha.optiic",
+                            "class": "OptiicCaptchaTask",
+                            "results_dir": "results/optiic"
+                        }
+                    }
+                }
+            }
+        },
+        "tools": {
+            "name": "工具任务",
+            "description": "辅助工具和数据生成",
+            "enabled": true,
+            "groups": {
+                "data_generator": {
+                    "name": "数据生成",
+                    "description": "生成假数据和测试数据",
+                    "enabled": true,
+                    "tasks": {
+                        "tools.randomuser": {
+                            "name": "RandomUser 生成",
+                            "description": "RandomUser.me 假数据生成 (姓名/邮箱/地址等)",
+                            "enabled": false,
+                            "module": "tasks.tools.random_user",
+                            "class": "RandomUserTask",
+                            "results_dir": "results/randomuser"
+                        }
+                    }
+                },
+                "proxy_parser": {
+                    "name": "代理解析",
+                    "description": "从公开源解析代理列表",
+                    "enabled": true,
+                    "tasks": {
+                        "tools.proxyparser": {
+                            "name": "Proxy Parser",
+                            "description": "多源代理解析 (ProxyList/SSL/Socks/FreeProxyList等)",
+                            "enabled": false,
+                            "module": "tasks.tools.proxy.proxy_parser",
+                            "class": "ProxyParserTask",
+                            "results_dir": "results/proxyparser"
                         }
                     }
                 }

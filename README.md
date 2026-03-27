@@ -28,6 +28,9 @@
 | email.fakemail | FakeMail API | FakeMail 临时邮箱 API (Cloudflare) |
 | email.fakemailcloudflare | FakeMail Cloudflare API | FakeMail Cloudflare 临时邮箱 API |
 | email.selfhosted | Self-Hosted Mail | 自托管临时邮箱服务 |
+| email.inboxkitten | InboxKitten API | InboxKitten 临时邮箱 API |
+| email.tempmailplus | TempMail Plus API | TempMail Plus 临时邮箱 API (多域名) |
+| email.tempmaillol | TempMail.lol API | TempMail.lol 临时邮箱 API |
 
 #### 真实邮箱注册 (real_email)
 
@@ -88,6 +91,7 @@
 |--------|------|------|
 | sms.freeotpapi | FreeOTP API | 免费短信OTP API |
 | sms.otpgateway | OTP Gateway | OTP Gateway 短信接码 |
+| sms.receivesms | ReceiveSMS Free | ReceiveSMS 免费短信接码 (多国家) |
 
 ### 代理任务 (proxy)
 
@@ -102,6 +106,14 @@
 |--------|------|------|
 | captcha.2captcha | 2Captcha | 2Captcha 验证码识别 |
 | captcha.anticaptcha | AntiCaptcha | AntiCaptcha 验证码识别 |
+| captcha.optiic | Optiic Captcha | Optiic 免费文字验证码识别 (需API Key) |
+
+### 工具任务 (tools)
+
+| 任务ID | 名称 | 说明 |
+|--------|------|------|
+| tools.randomuser | RandomUser 生成 | RandomUser.me 假数据生成 (姓名/邮箱/地址等) |
+| tools.proxyparser | Proxy Parser | 多源代理解析 |
 
 ## 安装
 
@@ -256,7 +268,10 @@ auto-register-tasks/
 │   │   ├── gmailnator.py   # Gmailnator
 │   │   ├── fakemail.py     # FakeMail
 │   │   ├── fakemail_cloudflare.py
-│   │   └── selfhosted.py   # Self-Hosted
+│   │   ├── selfhosted.py   # Self-Hosted
+│   │   ├── inboxkitten.py  # InboxKitten
+│   │   ├── tempmail_plus.py # TempMail Plus
+│   │   └── tempmail_lol.py  # TempMail.lol
 │   ├── ai/                  # AI服务任务模块
 │   │   ├── github.py
 │   │   ├── claude.py
@@ -269,11 +284,17 @@ auto-register-tasks/
 │   │   ├── cohere.py       # Cohere
 │   │   └── replicate.py    # Replicate
 │   ├── sms/                 # 短信任务模块
-│   │   └── __init__.py     # FreeOTP, OtpGateway
+│   │   ├── __init__.py     # FreeOTP, OtpGateway
+│   │   └── receive_sms.py  # ReceiveSMS
 │   ├── proxy/                # 代理任务模块
 │   │   └── __init__.py     # ProxyPool, ProxyChecker
-│   └── captcha/              # 验证码任务模块
-│       └── __init__.py      # 2Captcha, AntiCaptcha
+│   ├── captcha/              # 验证码任务模块
+│   │   ├── __init__.py      # 2Captcha, AntiCaptcha
+│   │   └── optiic.py        # Optiic Captcha
+│   └── tools/                # 工具模块
+│       ├── random_user.py    # RandomUser 假数据生成
+│       └── proxy/
+│           └── proxy_parser.py # 多源代理解析
 ├── logs/                     # 日志目录
 ├── results/                  # 账户结果存储
 ├── config.json               # 全局配置

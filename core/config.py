@@ -2,11 +2,17 @@
 配置管理模块
 支持 YAML 配置和环境变量
 """
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 import os
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
+    
     browser_path: str = ""
     proxy: str = ""
     bot_protection_wait: int = 12
@@ -16,10 +22,6 @@ class Settings(BaseSettings):
     results_base_dir: str = "results"
     logs_base_dir: str = "logs"
     temp_email_provider: str = "mailtm"
-    
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
 
 def get_settings() -> Settings:
     return Settings()

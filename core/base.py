@@ -10,6 +10,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Dict, List, Tuple, Any
 from dataclasses import dataclass, field
 from enum import Enum
+from contextlib import contextmanager
 
 
 class TaskStatus(Enum):
@@ -55,6 +56,7 @@ class BaseTask(ABC):
         self.logger = get_task_logger(config.task_id)
         self._browser = None
         self._page = None
+        self._action_logger = None
     
     @abstractmethod
     def execute(self) -> TaskResult:
@@ -95,9 +97,9 @@ class BaseTask(ABC):
     def log_debug(self, message: str):
         self.logger.debug(message)
     
-    def take_screenshot(self, name: str = None) -> Optional[str]:
+    def take_screenshot(self, name: str = None, full_page: bool = True) -> Optional[str]:
         if self._page:
-            return self.logger.take_screenshot(name, self._page)
+            return self.logger.take_screenshot(name, self._page, full_page)
         return None
     
     def take_error_screenshot(self) -> Optional[str]:
@@ -119,6 +121,8 @@ class BaseTask(ABC):
     def new_page(self):
         browser = self.get_browser()
         self._page = browser.new_page()
+        self.logger.browser_logger.set_page(self._page)
+        self.logger.perf_metrics.start()
         return self._page
     
     def close_browser(self):
@@ -129,6 +133,7 @@ class BaseTask(ABC):
                 pass
             self._browser = None
         self._page = None
+        self.logger.perf_metrics.end()
     
     def generate_strong_password(self, length: int = 16) -> str:
         chars = string.ascii_letters + string.digits + "!@#$%^&*"
@@ -163,7 +168,62 @@ class BaseTask(ABC):
     def on_task_end(self, result: TaskResult):
         self.logger.log_result(result.status.value, result.message, result.data)
         self.logger.info(f"Task ended: {result.status.value} - {result.message}")
+        self.logger.log_performance_summary()
         self.close_browser()
+    
+    def log_action_start(self, action: str, description: str = "", metadata: Dict = None):
+        """记录操作开始"""
+        self.logger.log_action_start(action, description, metadata)
+    
+    def log_action_end(self, action: str, description: str = "", success: bool = True):
+        """记录操作结束"""
+        self.logger.log_action_end(action, description, success)
+    
+    def log_browser_navigate(self, url: str) -> str:
+        """记录导航操作"""
+        return self.logger.browser_logger.log_navigate(url, self._page)
+    
+    def log_browser_click(self, selector: str) -> str:
+        """记录点击操作"""
+        return self.logger.browser_logger.log_click(selector, self._page)
+    
+    def log_browser_fill(self, selector: str, value: str, mask: bool = True) -> str:
+        """记录填写操作"""
+        return self.logger.browser_logger.log_fill(selector, value, self._page, mask)
+    
+    def log_browser_submit(self, selector: str = None) -> str:
+        """记录提交操作"""
+        return self.logger.browser_logger.log_submit(selector, self._page)
+    
+    def log_browser_wait(self, selector: str = None, timeout: int = None) -> str:
+        """记录等待操作"""
+        return self.logger.browser_logger.log_wait(selector, timeout, self._page)
+    
+    def log_browser_select(self, selector: str, value: str) -> str:
+        """记录选择操作"""
+        return self.logger.browser_logger.log_select(selector, value, self._page)
+    
+    def log_browser_hover(self, selector: str) -> str:
+        """记录悬停操作"""
+        return self.logger.browser_logger.log_hover(selector, self._page)
+    
+    def log_browser_evaluate(self, script: str) -> str:
+        """记录JavaScript执行"""
+        return self.logger.browser_logger.log_evaluate(script, self._page)
+    
+    def log_browser_error(self, error: str) -> str:
+        """记录浏览器错误"""
+        return self.logger.browser_logger.log_error(error, self._page)
+    
+    def log_console_message(self, msg_type: str, text: str) -> str:
+        """记录控制台消息"""
+        return self.logger.browser_logger.log_console_message(msg_type, text)
+    
+    @contextmanager
+    def measure_time(self, operation: str):
+        """上下文管理器，用于测量代码块执行时间"""
+        with self.logger.measure_time(operation):
+            yield
     
     def __del__(self):
         self.close_browser()
@@ -195,11 +255,6 @@ class TempMailProvider(EmailProvider):
 
 
 class IntegratedBaseTask(BaseTask):
-    """
-    集成Persona系统的任务基类
-    自动使用Persona身份、代理池和统一账号存储
-    """
-    
     _persona_system = None
     
     def __init__(self, config: TaskConfig, global_config: Dict[str, Any]):
@@ -210,7 +265,6 @@ class IntegratedBaseTask(BaseTask):
     
     @classmethod
     def init_persona(cls, data_dir: str = "data/persona"):
-        """初始化Persona系统"""
         if cls._persona_system is None:
             from persona_system import create_persona_system
             cls._persona_system = create_persona_system(data_dir)
@@ -218,23 +272,20 @@ class IntegratedBaseTask(BaseTask):
         return cls._persona_system
     
     @classmethod
-    def get_persona_system(cls):
-        """获取Persona系统单例"""
+    def get_persona(cls):
         if cls._persona_system is None:
             return cls.init_persona()
         return cls._persona_system
     
     def get_identity(self, service: Optional[str] = None) -> Optional[Dict]:
-        """获取Persona身份"""
         if self._identity is None:
-            ps = self.get_persona_system()
+            ps = self.get_persona()
             self._identity = ps.select_identity_for_service(service=service, strategy="isolation")
         return self._identity
     
     def get_proxy(self, country: Optional[str] = None) -> Optional[Dict]:
-        """获取Persona代理"""
         if self._proxy is None:
-            ps = self.get_persona_system()
+            ps = self.get_persona()
             identity = self.get_identity()
             identity_country = None
             if identity:
@@ -243,8 +294,7 @@ class IntegratedBaseTask(BaseTask):
         return self._proxy
     
     def auto_setup(self, service: str) -> Dict:
-        """自动准备身份和代理"""
-        ps = self.get_persona_system()
+        ps = self.get_persona()
         setup = ps.auto_setup(service)
         self._identity = setup.get("identity")
         self._proxy = setup.get("proxy")
@@ -258,8 +308,7 @@ class IntegratedBaseTask(BaseTask):
         username: Optional[str] = None,
         **extra_data
     ) -> Dict:
-        """保存账号到Persona统一存储"""
-        ps = self.get_persona_system()
+        ps = self.get_persona()
         identity_id = None
         if self._identity:
             identity_id = self._identity.get("id")
@@ -273,9 +322,6 @@ class IntegratedBaseTask(BaseTask):
         )
     
     def save_account(self, email: str, password: str, **extra_data):
-        """
-        保存账号 - 优先使用Persona存储，同时兼容旧的txt存储
-        """
         service_name = self._extract_service_name()
         
         try:
@@ -290,7 +336,6 @@ class IntegratedBaseTask(BaseTask):
             self._save_account_txt(email, password, **extra_data)
     
     def _save_account_txt(self, email: str, password: str, **extra_data):
-        """旧的txt存储方式（保留兼容）"""
         write_header = not os.path.exists(self.result_file) or os.path.getsize(self.result_file) == 0
         with open(self.result_file, "a", encoding="utf-8") as f:
             if write_header:
@@ -305,16 +350,12 @@ class IntegratedBaseTask(BaseTask):
             f.write("\t".join(values) + "\n")
     
     def _extract_service_name(self) -> str:
-        """从task_id提取服务名"""
         parts = self.config.task_id.split(".")
         if len(parts) >= 2:
             return parts[1]
         return self.config.task_id
     
     def get_browser(self):
-        """
-        获取浏览器 - 自动使用Persona代理
-        """
         if self._browser is None:
             from camoufox.sync_api import Camoufox
             launch_opts = {'headless': True}
@@ -344,7 +385,6 @@ class IntegratedBaseTask(BaseTask):
         return self._browser
     
     def close_browser(self):
-        """关闭浏览器"""
         super().close_browser()
         self._identity = None
         self._proxy = None

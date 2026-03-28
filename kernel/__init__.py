@@ -165,8 +165,8 @@ class Kernel:
     
     @property
     def account(self):
-        """账号模块 (预留)"""
-        return None
+        """账号模块"""
+        return self._modules.get("account")
     
     # ==================== 任务管理 ====================
     
@@ -264,12 +264,14 @@ class Kernel:
         from modules.workflow import WorkflowModule
         from modules.user import UserModule
         from modules.provider import ProviderModule
+        from modules.account import AccountModule
         
         self.register_module("scheduler", SchedulerModule(self))
         self.register_module("browser", BrowserModule(self))
         self.register_module("workflow", WorkflowModule(self))
         self.register_module("user", UserModule(self))
         self.register_module("provider", ProviderModule(self))
+        self.register_module("account", AccountModule(self))
     
     # ==================== 钩子系统 ====================
     

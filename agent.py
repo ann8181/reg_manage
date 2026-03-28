@@ -1,221 +1,181 @@
 """
-Agent - Unified API for Auto Register Tasks
-
-统一的Agent接口，整合：
-- Persona System (身份、代理、账号管理)
-- Provider System (临时邮箱服务)
-- Task System (任务执行)
-- Logger System (日志和监控)
+Agent - 统一入口
+通过kernel驱动的命令行和编程接口
 """
 
-import os
 import sys
-from typing import Dict, List, Optional, Any
-from pathlib import Path
-
-BASE_DIR = Path(__file__).parent
-sys.path.insert(0, str(BASE_DIR))
-
-from core.persona import PersonaSystem, create_persona_system
-from core.providers.factory import ProviderFactory
-from core.providers.chain import ProviderChain
-from core.task_manager import TaskManager
-from core.logger import get_task_logger, TaskLogger
+import os
+from kernel import Kernel, get_kernel
 
 
 class Agent:
-    """
-    统一Agent接口
-    """
+    """Agent - 用户级接口"""
     
-    _instance = None
+    def __init__(self):
+        self.kernel = get_kernel()
     
-    def __new__(cls, data_dir: str = "data"):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._init(data_dir)
-        return cls._instance
+    # ========== 任务 ==========
     
-    def _init(self, data_dir: str):
-        self.data_dir = Path(data_dir)
-        self.persona_dir = self.data_dir / "persona"
-        self.results_dir = self.data_dir / "results"
-        self.logs_dir = self.data_dir / "logs"
-        
-        self.persona_dir.mkdir(parents=True, exist_ok=True)
-        self.results_dir.mkdir(parents=True, exist_ok=True)
-        self.logs_dir.mkdir(parents=True, exist_ok=True)
-        
-        self.persona = create_persona_system(str(self.persona_dir))
-        
-        config_path = BASE_DIR / "config" / "tasks.json"
-        global_config_path = BASE_DIR / "config.json"
-        self.task_manager = TaskManager(str(config_path), str(global_config_path))
+    def run_task(self, task_id: str, **params):
+        """运行单个任务"""
+        return self.kernel.run_task(task_id, params)
     
-    def create_email(self, provider: str = "mailtm") -> Dict[str, Any]:
-        """创建临时邮箱"""
-        try:
-            p = ProviderFactory.create(provider)
-            email, password = p.create_email()
-            return {
-                "success": True,
-                "email": email,
-                "password": password,
-                "provider": provider
-            }
-        except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-                "provider": provider
-            }
+    def run_tasks(self, task_ids: list, **params):
+        """批量运行任务"""
+        return self.kernel.run_tasks(task_ids, params)
     
-    def get_messages(self, email: str, provider: str = "mailtm") -> List[Dict]:
-        """获取邮件列表"""
-        try:
-            p = ProviderFactory.create(provider)
-            messages = p.get_messages(email)
-            return [
-                {
-                    "id": msg.id,
-                    "from": msg.from_addr,
-                    "subject": msg.subject,
-                    "body": msg.body,
-                    "timestamp": msg.timestamp
-                }
-                for msg in messages
-            ]
-        except Exception as e:
-            return []
+    # ========== 调度 ==========
     
-    def get_verification_code(
+    def schedule(
         self,
-        email: str,
-        provider: str = "mailtm",
-        subject_contains: str = "",
-        max_wait: int = 120
-    ) -> Optional[str]:
-        """等待验证码"""
-        try:
-            p = ProviderFactory.create(provider)
-            return p.get_verification_code(email, subject_contains, max_wait)
-        except Exception:
-            return None
-    
-    def generate_identity(
-        self,
-        country: str = "US",
-        gender: Optional[str] = None
-    ) -> Dict:
-        """生成身份"""
-        return self.persona.generate_identity(country=country, gender=gender)
-    
-    def get_proxy(self, country: Optional[str] = None) -> Optional[Dict]:
-        """获取代理"""
-        return self.persona.get_proxy(country=country)
-    
-    def register_account(
-        self,
-        service: str,
-        email: str,
-        password: str,
-        username: Optional[str] = None,
-        identity_id: Optional[str] = None
-    ) -> Dict:
-        """注册账号"""
-        return self.persona.register_account(
-            service=service,
-            email=email,
-            password=password,
-            username=username,
-            identity_id=identity_id
+        name: str,
+        task_id: str,
+        schedule_type: str = "cron",
+        cron_expr: str = "",
+        interval_seconds: int = 0,
+        batch_size: int = 1
+    ) -> str:
+        """创建调度"""
+        return self.kernel.scheduler.add_schedule(
+            name=name,
+            task_id=task_id,
+            schedule_type=schedule_type,
+            cron_expr=cron_expr,
+            interval_seconds=interval_seconds,
+            batch_size=batch_size
         )
     
-    def get_account(self, service: str) -> Optional[Dict]:
-        """获取可用账号"""
-        return self.persona.get_available_account(service)
+    def list_schedules(self):
+        """列出所有调度"""
+        return self.kernel.scheduler.list_schedules()
     
-    def get_account_decrypted(self, service: str) -> Optional[Dict]:
-        """获取账号并解密"""
-        return self.persona.get_account_decrypted(service)
+    def run_schedule(self, schedule_id: str):
+        """立即执行调度"""
+        self.kernel.scheduler.run_now(schedule_id)
     
-    def list_tasks(self) -> Dict[str, Any]:
-        """列出所有任务"""
-        enabled = len(self.task_manager.get_enabled_tasks())
+    def pause_schedule(self, schedule_id: str):
+        """暂停调度"""
+        self.kernel.scheduler.pause(schedule_id)
+    
+    def resume_schedule(self, schedule_id: str):
+        """恢复调度"""
+        self.kernel.scheduler.resume(schedule_id)
+    
+    def remove_schedule(self, schedule_id: str):
+        """删除调度"""
+        self.kernel.scheduler.remove(schedule_id)
+    
+    # ========== 工作流 ==========
+    
+    def create_workflow(self, name: str, description: str = ""):
+        """创建工作流"""
+        return self.kernel.workflow.create_workflow(name, description)
+    
+    def run_workflow(self, workflow_id: str):
+        """执行工作流"""
+        return self.kernel.workflow.execute_workflow(workflow_id)
+    
+    # ========== 邮箱 ==========
+    
+    def create_email(self, provider: str = "mailtm"):
+        """创建临时邮箱"""
+        return self.kernel.provider.create_email(provider)
+    
+    def get_messages(self, email: str, provider: str = "mailtm"):
+        """获取邮件"""
+        return self.kernel.provider.get_messages(email, provider)
+    
+    def get_code(self, email: str, provider: str = "mailtm", **kwargs):
+        """等待验证码"""
+        return self.kernel.provider.get_verification_code(email, provider, **kwargs)
+    
+    # ========== 浏览器 ==========
+    
+    def create_browser(self, config_id: str = None, service: str = None):
+        """创建浏览器"""
+        return self.kernel.browser.create_browser(config_id, service)
+    
+    def close_browser(self, config_id: str = None):
+        """关闭浏览器"""
+        self.kernel.browser.close_browser(config_id or "default")
+    
+    # ========== 用户 ==========
+    
+    def login(self, username: str, password: str):
+        """用户登录"""
+        return self.kernel.user.authenticate(username, password)
+    
+    def whoami(self, token: str):
+        """验证token"""
+        user = self.kernel.user.validate_token(token)
+        if user:
+            return {"username": user.username, "role": user.role}
+        return None
+    
+    # ========== 系统 ==========
+    
+    def stats(self):
+        """系统统计"""
         return {
-            "total": len(self.task_manager.all_tasks),
-            "enabled": enabled,
-            "categories": [
-                {
-                    "id": cat.id,
-                    "name": cat.name,
-                    "groups": [
-                        {
-                            "id": grp.id,
-                            "name": grp.name,
-                            "tasks": [
-                                {"id": t.task_id, "name": t.name, "enabled": t.enabled}
-                                for t in grp.tasks
-                            ]
-                        }
-                        for grp in cat.groups
-                    ]
-                }
-                for cat in self.task_manager.categories.values()
-            ]
+            "schedules": len(self.kernel.scheduler.list_schedules()),
+            "workflows": len(self.kernel.workflow.list_workflows()),
+            "browsers": self.kernel.browser.get_stats(),
+            "providers": self.kernel.provider.list_providers()
         }
-    
-    def enable_task(self, task_id: str) -> bool:
-        """启用任务"""
-        task = self.task_manager.get_task(task_id)
-        if task:
-            self.task_manager.enable_task(task_id, True)
-            self.task_manager.save_config()
-            return True
-        return False
-    
-    def disable_task(self, task_id: str) -> bool:
-        """禁用任务"""
-        task = self.task_manager.get_task(task_id)
-        if task:
-            self.task_manager.enable_task(task_id, False)
-            self.task_manager.save_config()
-            return True
-        return False
-    
-    def run_task(self, task_id: str) -> Dict[str, Any]:
-        """运行任务"""
-        from core.executor import TaskExecutor
-        
-        task_config = self.task_manager.get_task(task_id)
-        if not task_config:
-            return {"success": False, "error": f"Task {task_id} not found"}
-        
-        executor = TaskExecutor(self.task_manager, max_workers=1)
-        result = executor.execute_task_by_id(task_id)
-        
-        if result:
-            return {
-                "success": result.status.value == "success",
-                "task_id": result.task_id,
-                "status": result.status.value,
-                "message": result.message,
-                "error": result.error
-            }
-        return {"success": False, "error": "Execution failed"}
-    
-    def get_stats(self) -> Dict:
-        """获取系统统计"""
-        return self.persona.get_system_stats()
-    
-    def get_providers(self) -> List[str]:
-        """获取可用Provider列表"""
-        return ProviderFactory.get_provider_names()
 
 
-def create_agent(data_dir: str = "data") -> Agent:
-    """创建Agent实例"""
-    return Agent(data_dir)
+# 全局agent实例
+_agent = None
 
 
-agent = create_agent()
+def get_agent() -> Agent:
+    global _agent
+    if _agent is None:
+        _agent = Agent()
+    return _agent
+
+
+if __name__ == "__main__":
+    import argparse
+    
+    agent = get_agent()
+    
+    parser = argparse.ArgumentParser(description="Auto Register Agent")
+    subparsers = parser.add_subparsers(dest="command")
+    
+    # 任务命令
+    run_parser = subparsers.add_parser("run", help="运行任务")
+    run_parser.add_argument("task_id", help="任务ID")
+    
+    schedule_parser = subparsers.add_parser("schedule", help="创建调度")
+    schedule_parser.add_argument("name", help="调度名称")
+    schedule_parser.add_argument("task_id", help="任务ID")
+    schedule_parser.add_argument("--cron", default="", help="Cron表达式")
+    schedule_parser.add_argument("--interval", type=int, default=0, help="间隔秒数")
+    
+    # 邮箱命令
+    email_parser = subparsers.add_parser("email", help="邮箱操作")
+    email_parser.add_argument("--provider", default="mailtm", help="Provider")
+    
+    args = parser.parse_args()
+    
+    if args.command == "run":
+        result = agent.run_task(args.task_id)
+        print(result)
+    
+    elif args.command == "schedule":
+        schedule_id = agent.schedule(
+            args.name,
+            args.task_id,
+            cron_expr=args.cron,
+            interval_seconds=args.interval
+        )
+        print(f"Schedule created: {schedule_id}")
+    
+    elif args.command == "email":
+        email, password = agent.create_email(args.provider)
+        print(f"Email: {email}")
+        print(f"Password: {password}")
+    
+    else:
+        parser.print_help()

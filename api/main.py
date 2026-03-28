@@ -1,6 +1,6 @@
 """
 Auto Register Tasks - Unified Management API
-完整的任务、调度、工作流、浏览器管理API
+基于Kernel的统一API
 """
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Header
@@ -13,18 +13,9 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from manager.scheduler import Scheduler, TaskSchedule, ScheduleType
-from manager.browser import BrowserManager, BrowserConfig, BrowserType
-from manager.workflow import WorkflowEngine, Workflow, WorkflowStep, StepType
-from manager.user import UserManager, UserRole
-from manager.account import AccountManager, Account
-from manager.module import ModuleManager, Module, ModuleStatus
+from kernel import get_kernel
 
-from core.providers.factory import ProviderFactory
-from core.task_manager import TaskManager
-from core.executor import TaskExecutor
-
-app = FastAPI(title="Auto Register Tasks Management API", version="3.0.0")
+app = FastAPI(title="Auto Register Tasks API", version="3.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,23 +25,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config/tasks.json")
-GLOBAL_CONFIG_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config.json")
-
-scheduler = Scheduler()
-browser_manager = BrowserManager()
-workflow_engine = WorkflowEngine()
-user_manager = UserManager()
-account_manager = AccountManager()
-module_manager = ModuleManager()
-task_manager = TaskManager(CONFIG_PATH, GLOBAL_CONFIG_PATH)
-
-
-async def get_current_user(authorization: str = Header(None)):
-    if not authorization:
-        return None
-    token = authorization.replace("Bearer ", "")
-    return user_manager.validate_token(token)
+kernel = get_kernel()
 
 
 @app.get("/health")
@@ -62,155 +37,75 @@ async def health():
     }
 
 
-@app.get("/tasks")
-async def list_tasks():
+@app.get("/stats")
+async def stats():
+    """系统统计"""
     return {
-        "total": len(task_manager.all_tasks),
-        "enabled": len(task_manager.get_enabled_tasks()),
-        "tasks": [
-            {"id": t.task_id, "name": t.name, "enabled": t.enabled}
-            for t in task_manager.all_tasks.values()
-        ]
+        "schedules": len(kernel.scheduler.list_schedules()),
+        "workflows": len(kernel.workflow.list_workflows()),
+        "browsers": kernel.browser.get_stats(),
+        "providers": kernel.provider.list_providers(),
+        "users": len(kernel.user.list_users())
     }
 
 
-@app.post("/tasks/{task_id}/enable")
-async def enable_task(task_id: str):
-    task_manager.enable_task(task_id, True)
-    task_manager.save_config()
-    return {"success": True}
-
-
-@app.post("/tasks/{task_id}/disable")
-async def disable_task(task_id: str):
-    task_manager.enable_task(task_id, False)
-    task_manager.save_config()
-    return {"success": True}
-
-
-@app.post("/tasks/{task_id}/run")
-async def run_task(task_id: str, background_tasks: BackgroundTasks):
-    executor = TaskExecutor(task_manager, max_workers=1)
-    result = executor.execute_task_by_id(task_id)
-    return {
-        "task_id": task_id,
-        "status": result.status.value if result else "unknown",
-        "message": result.message if result else ""
-    }
-
+# ========== 调度管理 ==========
 
 @app.get("/schedules")
 async def list_schedules():
-    schedules = scheduler.list_schedules()
-    return {
-        "total": len(schedules),
-        "schedules": [
-            {
-                "id": s.id,
-                "name": s.name,
-                "task_id": s.task_id,
-                "type": s.schedule_type.value,
-                "enabled": s.enabled,
-                "cron": s.cron_expr,
-                "interval": s.interval_seconds,
-                "next_run": s.next_run,
-                "last_run": s.last_run,
-                "run_count": s.run_count
-            }
-            for s in schedules
-        ]
-    }
+    schedules = kernel.scheduler.list_schedules()
+    return {"total": len(schedules), "schedules": schedules}
 
 
 @app.post("/schedules")
 async def create_schedule(
     name: str,
     task_id: str,
-    schedule_type: str,
+    schedule_type: str = "cron",
     cron_expr: str = "",
-    interval_seconds: int = 0
+    interval_seconds: int = 0,
+    batch_size: int = 1
 ):
-    schedule = scheduler.create_schedule(
+    schedule_id = kernel.scheduler.add_schedule(
         name=name,
         task_id=task_id,
-        schedule_type=ScheduleType(schedule_type),
+        schedule_type=schedule_type,
         cron_expr=cron_expr,
-        interval_seconds=interval_seconds
+        interval_seconds=interval_seconds,
+        batch_size=batch_size
     )
-    return {"id": schedule.id, "success": True}
+    return {"id": schedule_id, "success": True}
 
 
 @app.post("/schedules/{schedule_id}/run")
-async def run_schedule_now(schedule_id: str):
-    scheduler.run_now(schedule_id)
+async def run_schedule(schedule_id: str):
+    kernel.scheduler.run_now(schedule_id)
     return {"success": True}
 
 
 @app.post("/schedules/{schedule_id}/pause")
 async def pause_schedule(schedule_id: str):
-    scheduler.pause_schedule(schedule_id)
+    kernel.scheduler.pause(schedule_id)
     return {"success": True}
 
 
 @app.post("/schedules/{schedule_id}/resume")
 async def resume_schedule(schedule_id: str):
-    scheduler.resume_schedule(schedule_id)
+    kernel.scheduler.resume(schedule_id)
     return {"success": True}
 
 
 @app.delete("/schedules/{schedule_id}")
 async def delete_schedule(schedule_id: str):
-    scheduler.remove_schedule(schedule_id)
+    kernel.scheduler.remove(schedule_id)
     return {"success": True}
 
 
-@app.get("/browsers")
-async def list_browsers():
-    configs = browser_manager.list_configs()
-    return {
-        "total": len(configs),
-        "browsers": [
-            {
-                "id": c.id,
-                "name": c.name,
-                "type": c.browser_type.value,
-                "enabled": c.enabled,
-                "priority": c.priority,
-                "headless": c.headless
-            }
-            for c in configs
-        ]
-    }
-
-
-@app.get("/browsers/stats")
-async def browser_stats():
-    return browser_manager.get_stats()
-
-
-@app.post("/browsers")
-async def create_browser_config(config: BrowserConfig):
-    browser_manager.add_config(config)
-    return {"id": config.id, "success": True}
-
-
-@app.get("/browsers/{browser_id}")
-async def get_browser(browser_id: str):
-    config = browser_manager.get_config(browser_id)
-    if not config:
-        raise HTTPException(status_code=404, detail="Browser not found")
-    return config
-
-
-@app.delete("/browsers/{browser_id}")
-async def delete_browser(browser_id: str):
-    browser_manager.close_browser(browser_id)
-    return {"success": True}
-
+# ========== 工作流管理 ==========
 
 @app.get("/workflows")
 async def list_workflows():
-    workflows = workflow_engine.list_workflows()
+    workflows = kernel.workflow.list_workflows()
     return {
         "total": len(workflows),
         "workflows": [
@@ -218,7 +113,7 @@ async def list_workflows():
                 "id": w.id,
                 "name": w.name,
                 "description": w.description,
-                "status": w.status.value if hasattr(w.status, 'value') else str(w.status),
+                "status": w.status,
                 "steps": len(w.steps)
             }
             for w in workflows
@@ -228,110 +123,78 @@ async def list_workflows():
 
 @app.post("/workflows")
 async def create_workflow(name: str, description: str = ""):
-    wf = workflow_engine.create_workflow(name, description)
+    wf = kernel.workflow.create_workflow(name, description)
     return {"id": wf.id, "success": True}
 
 
 @app.post("/workflows/{workflow_id}/steps")
-async def add_workflow_step(
+async def add_step(
     workflow_id: str,
-    step: WorkflowStep
+    step_id: str,
+    step_name: str,
+    step_type: str = "task",
+    task_id: str = ""
 ):
-    step = workflow_engine.add_step(workflow_id, step)
-    return {"id": step.id, "success": True} if step else {"success": False}
+    from modules.workflow import WorkflowStep, StepType
+    step = WorkflowStep(
+        id=step_id,
+        name=step_name,
+        step_type=step_type,
+        task_id=task_id
+    )
+    step = kernel.workflow.add_step(workflow_id, step)
+    return {"id": step.id if step else None, "success": step is not None}
 
 
 @app.post("/workflows/{workflow_id}/run")
 async def run_workflow(workflow_id: str):
-    result = workflow_engine.execute_workflow(workflow_id)
+    result = kernel.workflow.execute_workflow(workflow_id)
     return result
 
 
-@app.get("/users")
-async def list_users():
-    users = user_manager.list_users()
+# ========== 浏览器管理 ==========
+
+@app.get("/browsers")
+async def list_browsers():
+    configs = kernel.browser.list_configs()
     return {
-        "total": len(users),
-        "users": [
-            {
-                "id": u.id,
-                "username": u.username,
-                "email": u.email,
-                "role": u.role.value,
-                "status": u.status.value if hasattr(u.status, 'value') else str(u.status)
-            }
-            for u in users
-        ]
+        "total": len(configs),
+        "browsers": [c.to_dict() for c in configs]
     }
 
 
+@app.get("/browsers/stats")
+async def browser_stats():
+    return kernel.browser.get_stats()
+
+
+# ========== 用户管理 ==========
+
 @app.post("/auth/login")
 async def login(username: str, password: str):
-    token = user_manager.authenticate(username, password)
+    token = kernel.user.authenticate(username, password)
     if token:
         return {"token": token, "success": True}
     raise HTTPException(status_code=401, detail="Invalid credentials")
 
 
-@app.post("/auth/logout")
-async def logout(token: str = Depends(get_current_user)):
-    if token:
-        user_manager.revoke_token(token)
-    return {"success": True}
+@app.get("/users")
+async def list_users():
+    users = kernel.user.list_users()
+    return {"total": len(users), "users": [u.to_dict() for u in users]}
 
 
-@app.get("/modules")
-async def list_modules():
-    modules = module_manager.list_modules()
-    return {
-        "total": len(modules),
-        "modules": [
-            {
-                "id": m.id,
-                "name": m.name,
-                "version": m.get_latest_version().version if m.get_latest_version() else "",
-                "status": m.status.value if hasattr(m.status, 'value') else str(m.status)
-            }
-            for m in modules
-        ]
-    }
-
-
-@app.get("/modules/{module_id}/info")
-async def get_module_info(module_id: str):
-    module = module_manager.get_module(module_id)
-    if not module:
-        raise HTTPException(status_code=404, detail="Module not found")
-    latest_version = module.get_latest_version()
-    return {
-        "id": module.id,
-        "name": module.name,
-        "description": module.description,
-        "status": module.status.value,
-        "version": latest_version.version if latest_version else "",
-        "versions": [
-            {"version": v.version, "changelog": v.changelog, "created_at": v.created_at}
-            for v in module.versions
-        ]
-    }
-
-
-@app.get("/accounts")
-async def list_accounts(service: str = None):
-    accounts = account_manager.list_accounts()
-    return {"total": len(accounts), "accounts": accounts}
-
+# ========== Provider管理 ==========
 
 @app.get("/providers")
 async def list_providers():
-    return {"providers": ProviderFactory.get_provider_names()}
+    return {"providers": kernel.provider.list_providers()}
 
 
 @app.post("/email/create")
 async def create_email(provider: str = "mailtm"):
     try:
-        p = ProviderFactory.create(provider)
-        email, password = p.create_email()
+        email, password = kernel.provider.create_email(provider)
         return {"email": email, "password": password, "provider": provider}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -340,32 +203,19 @@ async def create_email(provider: str = "mailtm"):
 @app.get("/email/{email}/messages")
 async def get_messages(email: str, provider: str = "mailtm"):
     try:
-        p = ProviderFactory.create(provider)
-        messages = p.get_messages(email)
-        return {
-            "messages": [
-                {"id": m.id, "from": m.from_addr, "subject": m.subject}
-                for m in messages
-            ]
-        }
+        messages = kernel.provider.get_messages(email, provider)
+        return {"messages": messages}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/dashboard/stats")
-async def dashboard_stats():
-    return {
-        "tasks": {
-            "total": len(task_manager.all_tasks),
-            "enabled": len(task_manager.get_enabled_tasks())
-        },
-        "schedules": scheduler.get_stats(),
-        "browsers": browser_manager.get_stats(),
-        "workflows": {"total": len(workflow_engine.list_workflows())},
-        "users": user_manager.get_stats(),
-        "accounts": {"total": len(account_manager.list_accounts())},
-        "modules": {"total": len(module_manager.list_modules())}
-    }
+@app.get("/email/{email}/code")
+async def get_code(email: str, provider: str = "mailtm", subject: str = "", max_wait: int = 120):
+    try:
+        code = kernel.provider.get_verification_code(email, provider, subject_contains=subject, max_wait=max_wait)
+        return {"code": code}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 if __name__ == "__main__":

@@ -183,6 +183,11 @@ class Kernel:
         """指标模块"""
         return self._modules.get("metrics")
     
+    @property
+    def webhook(self):
+        """Webhook 模块"""
+        return self._modules.get("webhook")
+    
     # ==================== 任务管理 ====================
     
     def register_task(self, task_id: str, task_class: Callable) -> None:
@@ -283,6 +288,7 @@ class Kernel:
         from modules.notification import NotificationModule
         from modules.cache import CacheModule
         from modules.metrics import MetricsModule
+        from modules.webhook import WebhookModule
         
         self.register_module("scheduler", SchedulerModule(self))
         self.register_module("browser", BrowserModule(self))
@@ -293,6 +299,7 @@ class Kernel:
         self.register_module("notification", NotificationModule(self))
         self.register_module("cache", CacheModule(self))
         self.register_module("metrics", MetricsModule(self))
+        self.register_module("webhook", WebhookModule(self))
     
     # ==================== 钩子系统 ====================
     

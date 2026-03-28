@@ -130,6 +130,15 @@ def metrics(kernel):
 
 
 @pytest.fixture
+def webhook(kernel):
+    """提供 WebhookModule 实例"""
+    from modules.webhook import WebhookModule
+    webhook_module = WebhookModule(kernel)
+    yield webhook_module
+    webhook_module.stop()
+
+
+@pytest.fixture
 def sample_workflow(workflow):
     """提供示例工作流"""
     from modules.workflow import WorkflowStep

@@ -2,272 +2,125 @@
 
 整合各种邮箱注册和 AI 服务注册任务的模块化系统，支持分层勾选执行。
 
-## 新版本特性
+## 核心特性
 
-- **模块化架构**：核心功能与任务实现分离
-- **Provider 抽象层**：统一的邮箱服务接口，支持 14+ 提供商
-- **故障转移链**：多 Provider 自动切换，保障服务可用性
-- **异步执行**：支持高并发任务执行
-- **插件机制**：支持任务插件的自动发现
-- **数据库存储**：SQLAlchemy 持久化存储
-- **REST API**：FastAPI 提供完整的 REST 接口
-- **Web 管理界面**：Gradio 可视化操作界面
-- **增强日志系统**：结构化日志、浏览器操作追踪、性能指标
-
-## 功能特性
-
-- 模块化设计：每个任务独立模块，可按需启用/禁用
-- 分层结构：Category -> Group -> Task 三层勾选
-- 灵活执行：支持按分类、组或单个任务执行
-- 账户管理：自动保存注册账户到数据库和文件
-- 日志系统：完整的运行日志、错误日志和截图功能
-- API 服务：完整的 REST API 接口
-- Web 界面：可视化任务管理和监控
-
-## 安装
-
-```bash
-pip install -r requirements.txt
-playwright install chromium
-```
-
-## 配置
-
-编辑 `.env` 文件或创建 `config.json`：
-
-```bash
-cp .env.example .env
-```
-
-## 使用方法
-
-### 命令行
-
-```bash
-# 列出所有任务
-python main.py list
-
-# 启用任务
-python main.py enable email.outlook
-
-# 禁用任务
-python main.py disable email.outlook
-
-# 运行任务
-python main.py run email.outlook
-```
-
-### 启动服务
-
-```bash
-# 启动 API 服务 (port 8000)
-./start.sh api
-
-# 启动 Web 界面 (port 7860)
-./start.sh web
-
-# 启动所有服务
-./start.sh all
-```
-
-### API 端点
-
-| 端点 | 方法 | 说明 |
-|------|------|------|
-| `/` | GET | 服务状态 |
-| `/health` | GET | 健康检查 |
-| `/tasks` | GET | 获取所有任务 |
-| `/tasks/{task_id}/enable` | POST | 启用任务 |
-| `/tasks/{task_id}/disable` | POST | 禁用任务 |
-| `/run/{task_id}` | POST | 执行任务 |
-| `/email/create` | POST | 创建临时邮箱 |
-| `/email/{email}/messages` | GET | 获取邮件列表 |
-| `/providers` | GET | 获取提供商列表 |
-
-### Web 界面
-
-启动后访问 http://localhost:7860
-
-功能：
-- 任务列表查看和管理
-- 临时邮箱创建和邮件获取
-- 任务执行和结果查看
-- 统计信息展示
+- **统一Agent接口** - `agent.py` 提供一站式API
+- **Persona系统** - 身份、代理、账号管理
+- **Provider抽象层** - 14+ 临时邮箱服务
+- **结构化日志** - 浏览器操作追踪、截图、性能指标
+- **REST API** - FastAPI 提供完整的 REST 接口
+- **Web管理界面** - Gradio 可视化操作界面
 
 ## 项目结构
 
 ```
 auto-register-tasks/
-├── api/                    # FastAPI 服务
-│   └── main.py            # REST API 入口
-├── core/                  # 核心框架
-│   ├── providers/         # Email Provider 抽象层
-│   │   ├── base.py       # 基类和异常定义
-│   │   ├── factory.py     # Provider 工厂
+├── agent.py                  # 统一Agent接口 (新建)
+├── api/                      # FastAPI 服务
+│   └── main.py              # REST API
+├── core/                    # 核心框架
+│   ├── persona/             # Persona系统 (身份/代理/账号)
+│   │   ├── generator.py    # 身份生成
+│   │   ├── proxy_pool.py   # 代理池
+│   │   ├── manager.py      # 账号管理
+│   │   └── selector.py     # 身份选择
+│   ├── providers/           # Email Providers (API调用)
+│   │   ├── factory.py      # Provider工厂
 │   │   ├── chain.py       # 故障转移链
-│   │   └── *.py          # 各 Provider 实现
-│   ├── base.py            # 任务基类
-│   ├── browser_task.py    # 浏览器任务基类
-│   ├── task_manager.py    # 任务管理器
-│   ├── executor.py        # 执行器
-│   ├── async_executor.py  # 异步执行器
-│   ├── logger.py          # 日志系统
-│   ├── log_analyzer.py    # 日志分析工具
-│   ├── config.py          # 配置管理
-│   ├── database.py        # 数据库
-│   └── plugin_manager.py  # 插件管理
-├── web/                   # Web 管理界面
-│   └── app.py            # Gradio 应用
-├── tests/                 # 测试
-│   ├── conftest.py
-│   ├── test_providers/
-│   └── test_core/
-├── tasks/                 # 任务模块
-│   ├── email/           # 邮箱任务
-│   ├── ai/              # AI 服务注册任务
-│   ├── sms/             # 短信任务
-│   ├── proxy/           # 代理任务
-│   ├── captcha/         # 验证码任务
-│   └── tools/           # 工具任务
-├── config/
-│   └── tasks.json        # 任务配置
-├── config.json           # 全局配置
-├── main.py              # CLI 入口
-├── start.sh             # 服务启动脚本
-└── requirements.txt     # 依赖
+│   │   └── *.py           # 14+ Provider实现
+│   ├── base.py             # 任务基类
+│   ├── browser_task.py     # 浏览器任务基类
+│   ├── task_manager.py     # 任务管理
+│   ├── executor.py         # 执行器
+│   ├── logger.py           # 日志系统
+│   └── log_analyzer.py     # 日志分析
+├── tasks/                   # 任务模块
+│   ├── register/           # 注册任务 (浏览器)
+│   │   ├── ai/            # 31个AI服务注册
+│   │   └── email/          # 2个邮箱注册
+│   ├── provider/           # 服务提供商 (API)
+│   │   ├── email/          # 14个临时邮箱
+│   │   └── sms/            # 短信服务
+│   └── tools/              # 工具
+│       ├── generator/       # 数据生成
+│       └── captcha/        # 验证码
+├── web/                     # Web管理界面
+│   └── app.py              # Gradio应用
+├── main.py                  # CLI入口
+├── start.sh                # 服务启动脚本
+└── requirements.txt        # 依赖
 ```
 
-## Email Provider 支持
+## 快速开始
 
-### API Providers
+```bash
+# 安装依赖
+pip install -r requirements.txt
 
-| Provider | 类名 | 状态 |
-|----------|------|------|
-| Mail.tm | MailTmProvider | 完整支持 |
-| GuerrillaMail | GuerrillaMailProvider | 完整支持 |
-| GetNada | GetNadaProvider | 完整支持 |
-| YopMail | YopMailProvider | 完整支持 |
-| 1SecMail | OneSecMailProvider | 完整支持 |
-| TempMail.org | TempMailOrgProvider | 完整支持 |
-| FakeMail | FakeMailProvider | 完整支持 |
-| Gmailnator | GmailnatorProvider | 完整支持 |
-| Mailsac | MailsacProvider | 需 API Key |
-| Temp Mail Asia | TempMailAsiaProvider | Web 转 API |
-| Emailnator | EmailnatorProvider | 完整支持 |
-| InboxKitten | InboxKittenProvider | 完整支持 |
-| TempMail Plus | TempMailPlusProvider | 完整支持 |
-| TempMail.lol | TempMailLolProvider | 完整支持 |
+# 启动API服务 (port 8000)
+./start.sh api
 
-### 故障转移使用
+# 启动Web界面 (port 7860)
+./start.sh web
+```
+
+## Agent API
 
 ```python
-from core.providers.factory import ProviderFactory
-from core.providers.chain import ProviderChain
+from agent import Agent, create_agent
 
-# 创建故障转移链
-chain = ProviderChain()
-chain.add_provider(ProviderFactory.create("mailtm"))
-chain.add_provider(ProviderFactory.create("guerrillamail"))
-chain.add_provider(ProviderFactory.create("getnada"))
+agent = create_agent()
 
-# 自动故障转移创建邮箱
-email, password, provider_name = chain.create_email()
+# 创建临时邮箱
+result = agent.create_email("mailtm")
+print(result)  # {"success": True, "email": "xxx@mail.tm", "password": "xxx"}
+
+# 获取邮件
+messages = agent.get_messages(result["email"], "mailtm")
+
+# 生成身份
+identity = agent.generate_identity("US")
+
+# 获取代理
+proxy = agent.get_proxy("US")
+
+# 注册账号
+account = agent.register_account("github", email, password)
+
+# 运行任务
+agent.run_task("register.ai.github")
 ```
 
 ## 日志系统
 
-### 日志目录结构
-
 ```
 logs/
 └── {task_id}/
-    ├── {task_id}_20260328.log           # 文本日志
-    ├── {task_id}_20260328.jsonl         # JSON 日志
-    ├── results.jsonl                    # 结果记录
-    ├── screenshots/
-    │   └── browser_actions/            # 浏览器截图
-    │       ├── act_xxx_navigate.png
-    │       ├── act_xxx_click.png
-    │       └── error_xxx.png
-    └── metrics/
-        ├── performance.jsonl            # 性能数据
-        └── summary.json                # 性能摘要
+    ├── {task_id}.log           # 文本日志
+    ├── {task_id}.jsonl         # JSON日志
+    ├── screenshots/             # 浏览器截图
+    │   └── browser_actions/     # 每步操作截图
+    └── metrics/                 # 性能指标
 ```
 
-### 浏览器任务基类 (BrowserTask)
+## Email Providers (14+)
 
-```python
-from core.browser_task import BrowserTask, EmailProviderTask
-
-class MyRegisterTask(BrowserTask):
-    def execute(self) -> TaskResult:
-        # 使用日志功能
-        self.log_action_start("register", "Starting registration")
-        
-        try:
-            # 浏览器操作
-            self.log_browser_navigate("https://example.com")
-            self.log_browser_fill("input[name='email']", email)
-            self.log_browser_click("button[type='submit']")
-            
-            # 截图
-            self.logger.take_screenshot("registration_complete", self._page)
-            
-            self.log_action_end("register", "Registration completed", success=True)
-            return TaskResult(...)
-        except Exception as e:
-            self.log_action_end("register", str(e), success=False)
-            return TaskResult(status=TaskStatus.FAILED, error=str(e))
-```
-
-### 日志分析工具
-
-```bash
-# 分析任务日志
-python -m core.log_analyzer analyze --task-id email.outlook
-
-# 生成报告
-python -m core.log_analyzer report --task-id email.outlook
-
-# 性能优化建议
-python -m core.log_analyzer optimize --task-id email.outlook
-```
-
-## 测试
-
-```bash
-# 运行所有测试
-pytest tests/ -v
-
-# 运行特定测试
-pytest tests/test_providers/test_mailtm.py -v
-```
-
-## API 使用示例
-
-```python
-import requests
-
-# 创建邮箱
-response = requests.post("http://localhost:8000/email/create", json={
-    "provider": "mailtm"
-})
-email_data = response.json()
-print(f"Email: {email_data['email']}")
-
-# 获取邮件
-response = requests.get(f"http://localhost:8000/email/{email_data['email']}/messages", params={
-    "provider": "mailtm"
-})
-messages = response.json()
-```
-
-## 注意事项
-
-1. IP 质量对注册成功率有很大影响
-2. 同一 IP 短时间内不宜多次注册
-3. 临时邮箱可能有延迟，建议增加等待时间
-4. 请勿用于非法用途
+| Provider | 状态 |
+|----------|------|
+| Mail.tm | 完整支持 |
+| GuerrillaMail | 完整支持 |
+| GetNada | 完整支持 |
+| YopMail | 完整支持 |
+| 1SecMail | 完整支持 |
+| TempMail.org | 完整支持 |
+| FakeMail | 完整支持 |
+| Gmailnator | 完整支持 |
+| Mailsac | 需API Key |
+| Temp Mail Asia | 完整支持 |
+| Emailnator | 完整支持 |
+| InboxKitten | 完整支持 |
+| TempMail Plus | 完整支持 |
+| TempMail.lol | 完整支持 |
 
 ## License
 

@@ -103,6 +103,15 @@ def account(kernel):
 
 
 @pytest.fixture
+def notification(kernel):
+    """提供 NotificationModule 实例"""
+    from modules.notification import NotificationModule
+    notif_module = NotificationModule(kernel)
+    yield notif_module
+    notif_module.stop()
+
+
+@pytest.fixture
 def sample_workflow(workflow):
     """提供示例工作流"""
     from modules.workflow import WorkflowStep

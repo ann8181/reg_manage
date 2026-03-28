@@ -206,8 +206,20 @@ class WorkflowModule:
                     
                     elif step.step_type == StepType.NOTIFY:
                         # 通知
-                        self.kernel.emit("notify", step.params)
-                        step.status = "completed"
+                        notification = self.kernel.notification
+                        if notification:
+                            msg = step.params.get("message", "")
+                            title = step.params.get("title", "")
+                            channel = step.params.get("channel")
+                            result = notification.send(msg, title, channel)
+                            step.result = result.to_dict()
+                            step.status = "completed" if result.success else "failed"
+                            if not result.success:
+                                step.error = result.error
+                        else:
+                            self.logger.warning("Notification module not available")
+                            step.status = "failed"
+                            step.error = "Notification module not available"
                     
                     # 处理后续步骤
                     if step_id in adjacency:

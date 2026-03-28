@@ -139,6 +139,15 @@ def webhook(kernel):
 
 
 @pytest.fixture
+def queue(kernel):
+    """提供 QueueModule 实例"""
+    from modules.queue import QueueModule
+    queue_module = QueueModule(kernel)
+    yield queue_module
+    queue_module.stop()
+
+
+@pytest.fixture
 def sample_workflow(workflow):
     """提供示例工作流"""
     from modules.workflow import WorkflowStep

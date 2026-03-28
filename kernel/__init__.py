@@ -168,6 +168,11 @@ class Kernel:
         """账号模块"""
         return self._modules.get("account")
     
+    @property
+    def notification(self):
+        """通知模块"""
+        return self._modules.get("notification")
+    
     # ==================== 任务管理 ====================
     
     def register_task(self, task_id: str, task_class: Callable) -> None:
@@ -265,6 +270,7 @@ class Kernel:
         from modules.user import UserModule
         from modules.provider import ProviderModule
         from modules.account import AccountModule
+        from modules.notification import NotificationModule
         
         self.register_module("scheduler", SchedulerModule(self))
         self.register_module("browser", BrowserModule(self))
@@ -272,6 +278,7 @@ class Kernel:
         self.register_module("user", UserModule(self))
         self.register_module("provider", ProviderModule(self))
         self.register_module("account", AccountModule(self))
+        self.register_module("notification", NotificationModule(self))
     
     # ==================== 钩子系统 ====================
     

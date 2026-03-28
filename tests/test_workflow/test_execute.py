@@ -94,16 +94,18 @@ class TestWorkflowStepTypes:
         
         assert step.status == "completed"
 
-    def test_step_type_notify(self, workflow, kernel, mocker):
+    def test_step_type_notify(self, running_kernel, mocker):
         """测试通知步骤"""
+        workflow = running_kernel.workflow
+        
         wf = workflow.create_workflow("notify_step_test")
         step = WorkflowStep(id="notify", name="Notify", step_type=StepType.NOTIFY, params={"message": "test"})
         workflow.add_step(wf.id, step)
         
-        mock_emit = mocker.patch.object(kernel, 'emit')
+        mock_send = mocker.patch.object(running_kernel.notification, 'send', return_value=mocker.Mock(success=True, to_dict=lambda: {"success": True}))
         workflow.execute_workflow(wf.id)
         
-        mock_emit.assert_called_once()
+        mock_send.assert_called_once()
 
 
 class TestWorkflowGraph:

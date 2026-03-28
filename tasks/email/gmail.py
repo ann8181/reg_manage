@@ -20,7 +20,7 @@ class GmailClient(BaseTask):
             mail.login(email, password)
             return mail
         except Exception as e:
-            self.log(f"Connection error: {e}")
+            self.logger.error(f"Connection error: {e}")
             return None
     
     def fetch_messages(self, mail: imaplib.IMAP4_SSL, folder: str = "INBOX", limit: int = 10) -> List[Dict]:
@@ -57,7 +57,7 @@ class GmailClient(BaseTask):
                         "body": body[:500]
                     })
         except Exception as e:
-            self.log(f"Fetch messages error: {e}")
+            self.logger.error(f"Fetch messages error: {e}")
         
         return messages
     
@@ -91,8 +91,8 @@ class GmailClient(BaseTask):
         return None
     
     def execute(self) -> TaskResult:
-        self.log("Gmail client is a utility class for receiving emails")
-        self.log("Use this with other registration tasks that need email verification")
+        self.logger.info("Gmail client is a utility class for receiving emails")
+        self.logger.info("Use this with other registration tasks that need email verification")
         
         return TaskResult(
             task_id=self.config.task_id,
@@ -109,7 +109,7 @@ class GmailIMAPTask(BaseTask):
         return True
     
     def execute(self) -> TaskResult:
-        self.log("Gmail IMAP task - configure with existing Gmail credentials")
+        self.logger.info("Gmail IMAP task - configure with existing Gmail credentials")
         
         return TaskResult(
             task_id=self.config.task_id,

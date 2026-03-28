@@ -4,16 +4,14 @@ import string
 import secrets
 from typing import Dict
 from faker import Faker
-from camoufox.sync_api import Camoufox
-from core.base import TaskConfig, BaseTask, TaskResult, TaskStatus
+from core.browser_task import BrowserTask
+from core.base import TaskConfig, TaskResult, TaskStatus
 
 
-class GitHubRegister(BaseTask):
+class GitHubRegister(BrowserTask):
     def __init__(self, config: TaskConfig, global_config: Dict):
         super().__init__(config, global_config)
         self.signup_url = global_config.get("ai_services", {}).get("github", {}).get("signup_url", "https://github.com/signup")
-        self.proxy = global_config.get("proxy", "")
-        self.browser_path = global_config.get("browser_path", "")
     
     def validate(self) -> bool:
         return True
@@ -24,36 +22,58 @@ class GitHubRegister(BaseTask):
         email = fake.email()
         password = self.generate_strong_password(14)
         
+        self.log_action_start("github_register", f"Registering GitHub account: {email}")
+        
         try:
-            launch_opts = {'headless': True}
-            if self.proxy:
-                launch_opts['proxy'] = self.proxy
-            if self.browser_path:
-                launch_opts['browser_path'] = self.browser_path
+            launch_opts = self._setup_browser()
             
+            from camoufox.sync_api import Camoufox
             with Camoufox(**launch_opts) as browser:
-                page = browser.new_page()
+                self._page = browser.new_page()
+                self.logger.browser_logger.set_page(self._page)
+                self.logger.perf_metrics.start()
                 
                 try:
-                    page.goto(self.signup_url, timeout=30000)
-                    page.wait_for_load_state("domcontentloaded")
+                    self.log_browser_navigate(self.signup_url)
+                    self._page.goto(self.signup_url, timeout=30000)
+                    self._page.wait_for_load_state("domcontentloaded")
                     time.sleep(2)
+                    self.logger.take_screenshot("01_signup_page", self._page)
                     
-                    page.get_by_role("textbox", name="Username").fill(username)
-                    page.get_by_role("textbox", name="Email").fill(email)
-                    page.get_by_role("button", name="Continue").click()
+                    self.log_browser_fill("Username", username, mask=False)
+                    self._page.get_by_role("textbox", name="Username").fill(username)
+                    self._page.wait_for_timeout(500)
+                    
+                    self.log_browser_fill("Email", email, mask=False)
+                    self._page.get_by_role("textbox", name="Email").fill(email)
+                    self._page.wait_for_timeout(500)
+                    
+                    self.log_browser_click("Continue")
+                    self._page.get_by_role("button", name="Continue").click()
                     time.sleep(2)
+                    self.logger.take_screenshot("02_email_filled", self._page)
                     
-                    page.get_by_role("textbox", name="Password").fill(password)
-                    page.get_by_role("button", name="Continue").click()
+                    self.log_browser_fill("Password", password, mask=False)
+                    self._page.get_by_role("textbox", name="Password").fill(password)
+                    self._page.wait_for_timeout(500)
+                    
+                    self.log_browser_click("Continue")
+                    self._page.get_by_role("button", name="Continue").click()
                     time.sleep(2)
+                    self.logger.take_screenshot("03_password_filled", self._page)
                     
-                    page.get_by_role("textbox", name="Verify").wait_for(timeout=5000)
+                    self._page.get_by_role("textbox", name="Verify").wait_for(timeout=5000)
+                    self.logger.take_screenshot("04_verification", self._page)
                     
                 except Exception as e:
-                    pass
+                    self.logger.error(f"Registration step failed: {str(e)}")
+                    self.logger.take_screenshot("error", self._page)
+                    raise
                 
                 self.save_account(email, password, username=username)
+                self.logger.perf_metrics.end()
+                
+                self.log_action_end("github_register", f"GitHub registration started: {email}", True)
                 
                 return TaskResult(
                     task_id=self.config.task_id,
@@ -63,6 +83,9 @@ class GitHubRegister(BaseTask):
                 )
                 
         except Exception as e:
+            self.logger.error(f"GitHub registration failed: {str(e)}")
+            self.logger.perf_metrics.end()
+            self.log_action_end("github_register", str(e), False)
             return TaskResult(
                 task_id=self.config.task_id,
                 status=TaskStatus.FAILED,

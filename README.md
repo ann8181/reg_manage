@@ -12,6 +12,7 @@
 - **数据库存储**：SQLAlchemy 持久化存储
 - **REST API**：FastAPI 提供完整的 REST 接口
 - **Web 管理界面**：Gradio 可视化操作界面
+- **增强日志系统**：结构化日志、浏览器操作追踪、性能指标
 
 ## 功能特性
 
@@ -102,17 +103,19 @@ auto-register-tasks/
 ├── core/                  # 核心框架
 │   ├── providers/         # Email Provider 抽象层
 │   │   ├── base.py       # 基类和异常定义
-│   │   ├── factory.py    # Provider 工厂
-│   │   ├── chain.py      # 故障转移链
+│   │   ├── factory.py     # Provider 工厂
+│   │   ├── chain.py       # 故障转移链
 │   │   └── *.py          # 各 Provider 实现
-│   ├── base.py           # 基类定义
-│   ├── task_manager.py   # 任务管理器
-│   ├── executor.py       # 执行器
-│   ├── async_executor.py # 异步执行器
-│   ├── logger.py         # 日志系统
-│   ├── config.py         # 配置管理
-│   ├── database.py       # 数据库
-│   └── plugin_manager.py # 插件管理
+│   ├── base.py            # 任务基类
+│   ├── browser_task.py    # 浏览器任务基类
+│   ├── task_manager.py    # 任务管理器
+│   ├── executor.py        # 执行器
+│   ├── async_executor.py  # 异步执行器
+│   ├── logger.py          # 日志系统
+│   ├── log_analyzer.py    # 日志分析工具
+│   ├── config.py          # 配置管理
+│   ├── database.py        # 数据库
+│   └── plugin_manager.py  # 插件管理
 ├── web/                   # Web 管理界面
 │   └── app.py            # Gradio 应用
 ├── tests/                 # 测试
@@ -120,12 +123,12 @@ auto-register-tasks/
 │   ├── test_providers/
 │   └── test_core/
 ├── tasks/                 # 任务模块
-│   ├── email/
-│   ├── ai/
-│   ├── sms/
-│   ├── proxy/
-│   ├── captcha/
-│   └── tools/
+│   ├── email/           # 邮箱任务
+│   ├── ai/              # AI 服务注册任务
+│   ├── sms/             # 短信任务
+│   ├── proxy/           # 代理任务
+│   ├── captcha/         # 验证码任务
+│   └── tools/           # 工具任务
 ├── config/
 │   └── tasks.json        # 任务配置
 ├── config.json           # 全局配置
@@ -169,6 +172,65 @@ chain.add_provider(ProviderFactory.create("getnada"))
 
 # 自动故障转移创建邮箱
 email, password, provider_name = chain.create_email()
+```
+
+## 日志系统
+
+### 日志目录结构
+
+```
+logs/
+└── {task_id}/
+    ├── {task_id}_20260328.log           # 文本日志
+    ├── {task_id}_20260328.jsonl         # JSON 日志
+    ├── results.jsonl                    # 结果记录
+    ├── screenshots/
+    │   └── browser_actions/            # 浏览器截图
+    │       ├── act_xxx_navigate.png
+    │       ├── act_xxx_click.png
+    │       └── error_xxx.png
+    └── metrics/
+        ├── performance.jsonl            # 性能数据
+        └── summary.json                # 性能摘要
+```
+
+### 浏览器任务基类 (BrowserTask)
+
+```python
+from core.browser_task import BrowserTask, EmailProviderTask
+
+class MyRegisterTask(BrowserTask):
+    def execute(self) -> TaskResult:
+        # 使用日志功能
+        self.log_action_start("register", "Starting registration")
+        
+        try:
+            # 浏览器操作
+            self.log_browser_navigate("https://example.com")
+            self.log_browser_fill("input[name='email']", email)
+            self.log_browser_click("button[type='submit']")
+            
+            # 截图
+            self.logger.take_screenshot("registration_complete", self._page)
+            
+            self.log_action_end("register", "Registration completed", success=True)
+            return TaskResult(...)
+        except Exception as e:
+            self.log_action_end("register", str(e), success=False)
+            return TaskResult(status=TaskStatus.FAILED, error=str(e))
+```
+
+### 日志分析工具
+
+```bash
+# 分析任务日志
+python -m core.log_analyzer analyze --task-id email.outlook
+
+# 生成报告
+python -m core.log_analyzer report --task-id email.outlook
+
+# 性能优化建议
+python -m core.log_analyzer optimize --task-id email.outlook
 ```
 
 ## 测试

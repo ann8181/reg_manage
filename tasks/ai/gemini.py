@@ -1,5 +1,6 @@
 import time
 from typing import Dict
+from core.browser_task import BrowserTask
 from core.base import TaskConfig, BaseTask, TaskResult, TaskStatus
 
 
@@ -24,45 +25,50 @@ class GeminiRegister(BaseTask):
         )
 
 
-class GeminiWebRegister(BaseTask):
+class GeminiWebRegister(BrowserTask):
     def __init__(self, config: TaskConfig, global_config: Dict):
         super().__init__(config, global_config)
         self.signup_url = "https://ai.google.dev"
-        self.proxy = global_config.get("proxy", "")
-        self.browser_path = global_config.get("browser_path", "")
     
     def validate(self) -> bool:
         return True
     
     def execute(self) -> TaskResult:
+        from faker import Faker
+        fake = Faker()
+        email = fake.email()
+        
+        self.log_action_start("gemini_register", f"Registering Gemini account: {email}")
+        
         try:
-            from faker import Faker
-            fake = Faker()
-            email = fake.email()
+            launch_opts = self._setup_browser()
             
             from camoufox.sync_api import Camoufox
-            
-            launch_opts = {'headless': True}
-            if self.proxy:
-                launch_opts['proxy'] = self.proxy
-            if self.browser_path:
-                launch_opts['browser_path'] = self.browser_path
-            
             with Camoufox(**launch_opts) as browser:
-                page = browser.new_page()
+                self._page = browser.new_page()
+                self.logger.browser_logger.set_page(self._page)
+                self.logger.perf_metrics.start()
                 
                 try:
-                    page.goto(self.signup_url, timeout=30000)
-                    page.wait_for_load_state("domcontentloaded")
+                    self.log_browser_navigate(self.signup_url)
+                    self._page.goto(self.signup_url, timeout=30000)
+                    self._page.wait_for_load_state("domcontentloaded")
                     time.sleep(2)
+                    self.logger.take_screenshot("01_home_page", self._page)
                     
-                    page.get_by_role("link", name="Get API Key").click()
+                    self.log_browser_click("Get API Key")
+                    self._page.get_by_role("link", name="Get API Key").click()
                     time.sleep(2)
+                    self.logger.take_screenshot("02_api_key_page", self._page)
                     
                 except Exception as e:
-                    pass
+                    self.logger.error(f"Registration step failed: {str(e)}")
+                    self.logger.take_screenshot("error", self._page)
+                    raise
                 
                 self.save_account(email, "")
+                self.logger.perf_metrics.end()
+                self.log_action_end("gemini_register", f"Gemini registration started: {email}", True)
                 
                 return TaskResult(
                     task_id=self.config.task_id,
@@ -72,6 +78,9 @@ class GeminiWebRegister(BaseTask):
                 )
                 
         except Exception as e:
+            self.logger.error(f"Gemini registration failed: {str(e)}")
+            self.logger.perf_metrics.end()
+            self.log_action_end("gemini_register", str(e), False)
             return TaskResult(
                 task_id=self.config.task_id,
                 status=TaskStatus.FAILED,

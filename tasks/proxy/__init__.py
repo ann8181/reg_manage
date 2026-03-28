@@ -1,8 +1,12 @@
 import time
 import httpx
+import logging
 import random
 from typing import List, Dict, Optional
 from core.base import TaskConfig, BaseTask, TaskResult, TaskStatus
+
+
+logger = logging.getLogger("proxy_providers")
 
 
 class ProxyPoolProvider:
@@ -21,7 +25,7 @@ class ProxyPoolProvider:
                 self.proxies = response.json()
                 return self.proxies
         except Exception as e:
-            print(f"[ProxyPool] Fetch proxies error: {e}")
+            logger.error(f"[ProxyPool] Fetch proxies error: {e}")
         return []
     
     def check_proxy(self, proxy: Dict) -> bool:
@@ -34,7 +38,7 @@ class ProxyPoolProvider:
             )
             return response.status_code == 200
         except Exception as e:
-            print(f"[ProxyPool] Check proxy error: {e}")
+            logger.error(f"[ProxyPool] Check proxy error: {e}")
             return False
     
     def get_random_proxy(self, protocol: str = "http") -> Optional[Dict]:
@@ -123,7 +127,7 @@ class ProxyCheckerProvider:
             result["latency"] = time.time() - start
             result["working"] = response.status_code == 200
         except Exception as e:
-            print(f"[ProxyChecker] Check proxy error: {e}")
+            logger.error(f"[ProxyChecker] Check proxy error: {e}")
         
         return result
     
@@ -144,7 +148,7 @@ class ProxyCheckerProvider:
                                 latency=str(result.get("latency", 0))
                             )
         except Exception as e:
-            print(f"[ProxyChecker] Check file error: {e}")
+            logger.error(f"[ProxyChecker] Check file error: {e}")
         
         return results
     

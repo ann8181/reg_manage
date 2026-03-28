@@ -3,16 +3,14 @@ import random
 import string
 from typing import Dict
 from faker import Faker
-from camoufox.sync_api import Camoufox
-from core.base import TaskConfig, BaseTask, TaskResult, TaskStatus
+from core.browser_task import BrowserTask
+from core.base import TaskConfig, TaskResult, TaskStatus
 
 
-class TraeRegister(BaseTask):
+class TraeRegister(BrowserTask):
     def __init__(self, config: TaskConfig, global_config: Dict):
         super().__init__(config, global_config)
         self.signup_url = global_config.get("ai_services", {}).get("trae", {}).get("signup_url", "https://www.trae.ai/sign-up")
-        self.proxy = global_config.get("proxy", "")
-        self.browser_path = global_config.get("browser_path", "")
     
     def validate(self) -> bool:
         return True
@@ -32,28 +30,42 @@ class TraeRegister(BaseTask):
         email = f"{email_username}@outlook.com"
         password = self.generate_strong_password(14)
         
+        self.log_action_start("trae_register", f"Registering Trae account: {email}")
+        
         try:
-            launch_opts = {'headless': True}
-            if self.proxy:
-                launch_opts['proxy'] = self.proxy
-            if self.browser_path:
-                launch_opts['browser_path'] = self.browser_path
+            launch_opts = self._setup_browser()
             
+            from camoufox.sync_api import Camoufox
             with Camoufox(**launch_opts) as browser:
-                page = browser.new_page()
+                self._page = browser.new_page()
+                self.logger.browser_logger.set_page(self._page)
+                self.logger.perf_metrics.start()
                 
                 try:
-                    page.goto(self.signup_url, timeout=30000)
-                    page.wait_for_load_state("domcontentloaded")
-                    
-                    page.get_by_role("textbox", name="Email").fill(email)
-                    page.get_by_text("Send Code").click()
+                    self.log_browser_navigate(self.signup_url)
+                    self._page.goto(self.signup_url, timeout=30000)
+                    self._page.wait_for_load_state("domcontentloaded")
                     time.sleep(2)
+                    self.logger.take_screenshot("01_signup_page", self._page)
+                    
+                    self.log_browser_fill("Email", email, mask=False)
+                    self._page.get_by_role("textbox", name="Email").fill(email)
+                    self._page.wait_for_timeout(500)
+                    self.logger.take_screenshot("02_email_filled", self._page)
+                    
+                    self.log_browser_click("Send Code")
+                    self._page.get_by_text("Send Code").click()
+                    time.sleep(2)
+                    self.logger.take_screenshot("03_code_sent", self._page)
                     
                 except Exception as e:
-                    pass
+                    self.logger.error(f"Registration step failed: {str(e)}")
+                    self.logger.take_screenshot("error", self._page)
+                    raise
                 
                 self.save_account(email, password)
+                self.logger.perf_metrics.end()
+                self.log_action_end("trae_register", f"Trae registration started: {email}", True)
                 
                 return TaskResult(
                     task_id=self.config.task_id,
@@ -63,6 +75,9 @@ class TraeRegister(BaseTask):
                 )
                 
         except Exception as e:
+            self.logger.error(f"Trae registration failed: {str(e)}")
+            self.logger.perf_metrics.end()
+            self.log_action_end("trae_register", str(e), False)
             return TaskResult(
                 task_id=self.config.task_id,
                 status=TaskStatus.FAILED,

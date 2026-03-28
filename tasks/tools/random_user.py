@@ -3,6 +3,7 @@ import random
 from typing import Optional, List
 from dataclasses import dataclass
 from enum import Enum
+from core.logger import get_task_logger
 
 
 class Gender(Enum):
@@ -147,8 +148,10 @@ class RandomUserTask:
     def __init__(self, config: dict, global_config: dict):
         self.config = config
         self.global_config = global_config
+        self.logger = get_task_logger("random_user")
     
     def execute(self, gender: str = None, nat: str = None) -> dict:
+        self.logger.info("Starting random user generation")
         try:
             gen = RandomUserGenerator()
             person = gen.generate(
@@ -158,6 +161,7 @@ class RandomUserTask:
             gen.close()
             
             if person:
+                self.logger.info(f"Successfully generated user: {person.full_name}")
                 return {
                     "status": "success",
                     "message": f"Generated person: {person.full_name}",
@@ -170,8 +174,10 @@ class RandomUserTask:
                         "nat": person.nat
                     }
                 }
+            self.logger.error("Failed to generate person: no result returned")
             return {"status": "failed", "message": "Failed to generate person"}
         except Exception as e:
+            self.logger.error(f"Random user generation failed: {e}")
             return {"status": "failed", "error": str(e)}
 
 

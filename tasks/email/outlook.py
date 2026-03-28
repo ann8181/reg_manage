@@ -79,52 +79,70 @@ class OutlookRegister(BaseTask):
                 
                 self.logger.info("Navigating to signup page...")
                 try:
+                    self.log_browser_navigate("https://signup.live.com/signup?mkt=EN-US&lc=1033")
                     self._page.goto("https://signup.live.com/signup?mkt=EN-US&lc=1033", timeout=30000, wait_until="domcontentloaded")
                     self._page.wait_for_load_state("domcontentloaded")
                     self._page.wait_for_timeout(2000)
-                    self.take_screenshot("01_signup_page")
+                    self.logger.take_screenshot("01_signup_page", self._page, True)
 
+                    self.logger.log_action_start("fill_email", "Fill email field")
                     self.logger.info("Filling email field...")
                     self._page.get_by_role("textbox", name="Email").wait_for(timeout=15000)
+                    self.log_browser_fill("Email", email_username, True)
                     self._page.get_by_role("textbox", name="Email").fill(email_username)
+                    self.log_browser_click("text=Next")
                     self._page.get_by_text("Next").click()
                     self._page.wait_for_timeout(3000)
-                    self.take_screenshot("02_email_filled")
+                    self.logger.take_screenshot("02_email_filled", self._page, True)
+                    self.logger.log_action_end("fill_email", "Email field filled", True)
                     
+                    self.logger.log_action_start("fill_password", "Fill password field")
                     self.logger.info("Filling password field...")
                     self._page.locator('[type="password"]').wait_for(timeout=10000)
+                    self.log_browser_fill("password", password, True)
                     self._page.locator('[type="password"]').fill(password)
+                    self.log_browser_click("text=Next")
                     self._page.get_by_text("Next").click()
                     self._page.wait_for_timeout(3000)
-                    self.take_screenshot("03_password_filled")
+                    self.logger.take_screenshot("03_password_filled", self._page, True)
+                    self.logger.log_action_end("fill_password", "Password field filled", True)
                     
+                    self.logger.log_action_start("fill_birthdate", "Fill birthdate")
                     self.logger.info("Filling birthdate...")
                     self._page.locator('[name="BirthYear"]').fill(year)
                     self._page.locator('[name="BirthMonth"]').select_option(value=month)
                     self._page.wait_for_timeout(500)
                     self._page.locator('[name="BirthDay"]').select_option(value=day)
                     self._page.wait_for_timeout(500)
+                    self.log_browser_click("text=Next")
                     self._page.get_by_text("Next").click()
                     self._page.wait_for_timeout(3000)
-                    self.take_screenshot("04_birthdate_filled")
+                    self.logger.take_screenshot("04_birthdate_filled", self._page, True)
+                    self.logger.log_action_end("fill_birthdate", "Birthdate filled", True)
                     
+                    self.logger.log_action_start("fill_name", "Fill name")
                     self.logger.info("Filling name...")
+                    self.log_browser_fill("lastNameInput", lastname, True)
                     self._page.locator('#lastNameInput').fill(lastname)
+                    self.log_browser_fill("firstNameInput", firstname, True)
                     self._page.locator('#firstNameInput').fill(firstname)
+                    self.log_browser_click("text=Next")
                     self._page.get_by_text("Next").click()
                     self._page.wait_for_timeout(5000)
-                    self.take_screenshot("05_name_filled")
+                    self.logger.take_screenshot("05_name_filled", self._page, True)
+                    self.logger.log_action_end("fill_name", "Name filled", True)
                     
                     try:
                         self._page.wait_for_url(lambda url: "https://login.live.com/" in url or "https://outlook.live.com/" in url, timeout=30000)
                     except:
                         self.logger.warning("Page redirect timeout")
                     
-                    self.take_screenshot("06_final_page")
+                    self.logger.take_screenshot("06_final_page", self._page, True)
 
                 except Exception as e:
+                    self.logger.log_action_end("registration", "Registration failed", False)
                     self.logger.error(f"Registration step failed: {str(e)}")
-                    self.take_error_screenshot("error_during_registration")
+                    self.take_error_screenshot()
                     return TaskResult(
                         task_id=self.config.task_id,
                         status=TaskStatus.FAILED,
@@ -144,7 +162,7 @@ class OutlookRegister(BaseTask):
 
         except Exception as e:
             self.logger.error(f"Outlook registration failed: {str(e)}", e)
-            self.take_error_screenshot("error_outlook_registration")
+            self.take_error_screenshot()
             return TaskResult(
                 task_id=self.config.task_id,
                 status=TaskStatus.FAILED,

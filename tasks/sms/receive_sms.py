@@ -3,6 +3,7 @@ import httpx
 import re
 from typing import List, Dict, Optional
 from enum import Enum
+from core.logger import get_task_logger
 
 
 class Countries(Enum):
@@ -114,15 +115,19 @@ class ReceiveSmsFreeTask:
         self.config = config
         self.global_config = global_config
         self.provider = None
+        self.logger = get_task_logger("receive_sms")
     
     def execute(self) -> dict:
+        self.logger.info("Starting SMS receive task")
         try:
             self.provider = ReceiveSms()
             phone = self.provider.get_number()
             
             if not phone:
+                self.logger.error("Failed to get phone number")
                 return {"status": "failed", "message": "Failed to get phone number"}
             
+            self.logger.info(f"Successfully obtained phone number: {phone.number}")
             return {
                 "status": "success",
                 "message": f"Phone number: {phone.number}",
@@ -133,6 +138,7 @@ class ReceiveSmsFreeTask:
                 }
             }
         except Exception as e:
+            self.logger.error(f"SMS receive task failed: {e}")
             return {"status": "failed", "error": str(e)}
         finally:
             if self.provider:

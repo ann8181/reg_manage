@@ -1,5 +1,6 @@
 from typing import Optional, List, Dict
 from tasks.tools.proxy import ProxyManager, ProxyType, ProxyItem, ProxyStatus
+import logging
 
 
 class ProxyClient:
@@ -14,10 +15,15 @@ class ProxyClient:
         if not hasattr(self, "_initialized"):
             self._initialized = True
             self._manager = ProxyManager(db_path=db_path)
+            self.logger = logging.getLogger("proxy_client")
 
     def get_random(self, proxy_type: Optional[str] = None) -> Optional[str]:
         ptype = ProxyType(proxy_type) if proxy_type else None
         proxy = self._manager.get_random_working(proxy_type=ptype)
+        if proxy:
+            self.logger.debug(f"Retrieved proxy: {proxy.proxy_str}")
+        else:
+            self.logger.debug("No working proxy available")
         return proxy.proxy_str if proxy else None
 
     def get_for_httpx(self, proxy_type: Optional[str] = None) -> Optional[Dict[str, str]]:
@@ -38,9 +44,10 @@ class ProxyClient:
                     for p in proxies:
                         if p.ip == ip and p.port == int(port):
                             self._manager.record_success(p)
+                            self.logger.debug(f"Recorded proxy success: {proxy_str}")
                             break
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.warning(f"Failed to record proxy success: {e}")
 
     def record_failure(self, proxy_str: str):
         try:
@@ -54,12 +61,15 @@ class ProxyClient:
                     for p in proxies:
                         if p.ip == ip and p.port == int(port):
                             self._manager.record_failure(p)
+                            self.logger.debug(f"Recorded proxy failure: {proxy_str}")
                             break
-        except Exception:
-            pass
+        except Exception as e:
+            self.logger.warning(f"Failed to record proxy failure: {e}")
 
     def grab_and_validate(self) -> Dict:
+        self.logger.info("Starting proxy grab and validation")
         grab_count, working_count = self._manager.grab_and_validate()
+        self.logger.info(f"Proxy grab completed: grabbed={grab_count}, working={working_count}")
         return {
             "grabbed": grab_count,
             "working": working_count,
@@ -71,6 +81,7 @@ class ProxyClient:
 
     def list_working(self, limit: int = 50) -> List[str]:
         proxies = self._manager.get_working_proxies(limit=limit)
+        self.logger.debug(f"Retrieved {len(proxies)} working proxies")
         return [p.proxy_str for p in proxies]
 
 

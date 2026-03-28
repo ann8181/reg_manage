@@ -1,7 +1,11 @@
 import time
 import httpx
+import logging
 from typing import List, Dict, Optional
 from core.base import TaskConfig, BaseTask, TaskResult, TaskStatus
+
+
+logger = logging.getLogger("sms_providers")
 
 
 class FreeOtpApiProvider:
@@ -18,7 +22,7 @@ class FreeOtpApiProvider:
             if response.status_code == 200:
                 return response.json()
         except Exception as e:
-            print("[FreeOtpApi] Get numbers error: " + str(e))
+            logger.error("[FreeOtpApi] Get numbers error: " + str(e))
         return []
     
     def request_otp(self, phone: str, service: str = "whatsapp") -> Optional[str]:
@@ -31,7 +35,7 @@ class FreeOtpApiProvider:
                 data = response.json()
                 return data.get("id")
         except Exception as e:
-            print("[FreeOtpApi] Request OTP error: " + str(e))
+            logger.error("[FreeOtpApi] Request OTP error: " + str(e))
         return None
     
     def get_otp(self, otp_id: str, max_wait: int = 120) -> Optional[str]:
@@ -45,7 +49,7 @@ class FreeOtpApiProvider:
                     if otp:
                         return otp
             except Exception as e:
-                print("[FreeOtpApi] Get OTP error: " + str(e))
+                logger.error("[FreeOtpApi] Get OTP error: " + str(e))
             time.sleep(10)
         return None
     
@@ -103,7 +107,7 @@ class OtpGatewayProvider:
             if response.status_code == 200:
                 return response.json()
         except Exception as e:
-            print("[OtpGateway] Get services error: " + str(e))
+            logger.error("[OtpGateway] Get services error: " + str(e))
         return []
     
     def get_number(self, service: str) -> Optional[Dict]:
@@ -115,7 +119,7 @@ class OtpGatewayProvider:
             if response.status_code == 200:
                 return response.json()
         except Exception as e:
-            print("[OtpGateway] Get number error: " + str(e))
+            logger.error("[OtpGateway] Get number error: " + str(e))
         return None
     
     def get_otp(self, number_id: str, max_wait: int = 120) -> Optional[str]:
@@ -129,7 +133,7 @@ class OtpGatewayProvider:
                     if otp:
                         return otp
             except Exception as e:
-                print("[OtpGateway] Get OTP error: " + str(e))
+                logger.error("[OtpGateway] Get OTP error: " + str(e))
             time.sleep(10)
         return None
     
@@ -137,7 +141,7 @@ class OtpGatewayProvider:
         try:
             self.client.delete(self.api_url + "/number/" + number_id)
         except Exception as e:
-            print("[OtpGateway] Release number error: " + str(e))
+            logger.error("[OtpGateway] Release number error: " + str(e))
     
     def close(self):
         self.client.close()

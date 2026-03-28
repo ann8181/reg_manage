@@ -112,6 +112,15 @@ def notification(kernel):
 
 
 @pytest.fixture
+def cache(kernel):
+    """提供 CacheModule 实例"""
+    from modules.cache import CacheModule
+    cache_module = CacheModule(kernel)
+    yield cache_module
+    cache_module.stop()
+
+
+@pytest.fixture
 def sample_workflow(workflow):
     """提供示例工作流"""
     from modules.workflow import WorkflowStep

@@ -173,6 +173,11 @@ class Kernel:
         """通知模块"""
         return self._modules.get("notification")
     
+    @property
+    def cache(self):
+        """缓存模块"""
+        return self._modules.get("cache")
+    
     # ==================== 任务管理 ====================
     
     def register_task(self, task_id: str, task_class: Callable) -> None:
@@ -271,6 +276,7 @@ class Kernel:
         from modules.provider import ProviderModule
         from modules.account import AccountModule
         from modules.notification import NotificationModule
+        from modules.cache import CacheModule
         
         self.register_module("scheduler", SchedulerModule(self))
         self.register_module("browser", BrowserModule(self))
@@ -279,6 +285,7 @@ class Kernel:
         self.register_module("provider", ProviderModule(self))
         self.register_module("account", AccountModule(self))
         self.register_module("notification", NotificationModule(self))
+        self.register_module("cache", CacheModule(self))
     
     # ==================== 钩子系统 ====================
     

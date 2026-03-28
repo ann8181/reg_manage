@@ -334,6 +334,206 @@ class TempMailProvider(Provider):
         self._client.close()
 
 
+class ThrowAwayMailProvider(Provider):
+    """ThrowAwayMail Provider - 一次性临时邮箱"""
+    
+    def __init__(self, api_url: str = "https://www.throwawaymail.com"):
+        super().__init__("throwawaymail", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+        self._session_id = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        try:
+            resp = self._client.get(f"{self.api_url}/email-generator")
+            if resp.status_code == 200:
+                import re
+                email_match = re.search(r'([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', resp.text)
+                if email_match:
+                    self._email = email_match.group(1)
+                    return self._email, ""
+        except Exception:
+            pass
+        return "", ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        try:
+            resp = self._client.get(f"{self.api_url}/email/{email.split('@')[0]}")
+            if resp.status_code == 200:
+                import re
+                messages = []
+                subjects = re.findall(r'<td[^>]*class="[^"]*subject[^"]*"[^>]*>([^<]+)<', resp.text)
+                for i, subject in enumerate(subjects[:10]):
+                    messages.append({"id": str(i), "subject": subject.strip()})
+                return messages
+        except Exception:
+            pass
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
+class MaildropProvider(Provider):
+    """Maildrop Provider - 临时邮箱"""
+    
+    def __init__(self, api_url: str = "https://api.maildrop.cc"):
+        super().__init__("maildrop", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        import secrets
+        username = secrets.token_hex(8)
+        self._email = f"{username}@maildrop.cc"
+        return self._email, ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        try:
+            inbox_id = email.split("@")[0]
+            resp = self._client.get(f"{self.api_url}/api/v1/{inbox_id}", headers={"Accept": "application/json"})
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("messages", [])
+        except Exception:
+            pass
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
+class FakeEmailGeneratorProvider(Provider):
+    """FakeEmailGenerator Provider"""
+    
+    def __init__(self, api_url: str = "https://www.fakemailgenerator.com"):
+        super().__init__("fakemail", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        try:
+            resp = self._client.get(f"{self.api_url}/")
+            if resp.status_code == 200:
+                import re
+                email_match = re.search(r'([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', resp.text)
+                if email_match:
+                    self._email = email_match.group(1)
+                    return self._email, ""
+        except Exception:
+            pass
+        return "", ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
+class MintEmailProvider(Provider):
+    """MintEmail Provider - 临时邮箱"""
+    
+    def __init__(self, api_url: str = "https://www.mintemail.com"):
+        super().__init__("mintemail", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        try:
+            resp = self._client.get(f"{self.api_url}/")
+            if resp.status_code == 200:
+                import re
+                email_match = re.search(r'value="([^"]+@mintemail\.com)"', resp.text)
+                if email_match:
+                    self._email = email_match.group(1)
+                    return self._email, ""
+        except Exception:
+            pass
+        return "", ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
+class AirMailProvider(Provider):
+    """AirMail Provider - 临时邮箱"""
+    
+    def __init__(self, api_url: str = "https://airmail.email"):
+        super().__init__("airmail", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        import secrets
+        username = secrets.token_hex(8)
+        self._email = f"{username}@airmail.email"
+        return self._email, ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
+class MailnesiaProvider(Provider):
+    """Mailnesia Provider - 临时邮箱"""
+    
+    def __init__(self, api_url: str = "https://mailnesia.com"):
+        super().__init__("mailnesia", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        import secrets
+        username = secrets.token_hex(8)
+        self._email = f"{username}@mailnesia.com"
+        return self._email, ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        try:
+            inbox_id = email.split("@")[0]
+            resp = self._client.get(f"{self.api_url}/mailbox/{inbox_id}")
+            if resp.status_code == 200:
+                import re
+                messages = []
+                subjects = re.findall(r'<td[^>]*class="[^"]*subject[^"]*"[^>]*>([^<]+)<', resp.text)
+                for i, subject in enumerate(subjects[:10]):
+                    messages.append({"id": str(i), "subject": subject.strip()})
+                return messages
+        except Exception:
+            pass
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
+class TempInboxProvider(Provider):
+    """TempInbox Provider - 临时邮箱"""
+    
+    def __init__(self, api_url: str = "https://tempinbox.com"):
+        super().__init__("tempinbox", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        import secrets
+        username = secrets.token_hex(8)
+        self._email = f"{username}@tempinbox.com"
+        return self._email, ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
 class ProviderModule:
     """
     Provider模块
@@ -347,6 +547,13 @@ class ProviderModule:
         "10minutemail": TenMinuteMailProvider,
         "yopmail": YopMailProvider,
         "tempmail": TempMailProvider,
+        "throwawaymail": ThrowAwayMailProvider,
+        "maildrop": MaildropProvider,
+        "fakemail": FakeEmailGeneratorProvider,
+        "mintemail": MintEmailProvider,
+        "airmail": AirMailProvider,
+        "mailnesia": MailnesiaProvider,
+        "tempinbox": TempInboxProvider,
     }
     
     def __init__(self, kernel):

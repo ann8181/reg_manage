@@ -157,6 +157,15 @@ def template(kernel):
 
 
 @pytest.fixture
+def audit(kernel):
+    """提供 AuditModule 实例"""
+    from modules.audit import AuditModule
+    audit_module = AuditModule(kernel)
+    yield audit_module
+    audit_module.stop()
+
+
+@pytest.fixture
 def sample_workflow(workflow):
     """提供示例工作流"""
     from modules.workflow import WorkflowStep

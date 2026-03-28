@@ -121,6 +121,15 @@ def cache(kernel):
 
 
 @pytest.fixture
+def metrics(kernel):
+    """提供 MetricsModule 实例"""
+    from modules.metrics import MetricsModule
+    metrics_module = MetricsModule(kernel)
+    yield metrics_module
+    metrics_module.stop()
+
+
+@pytest.fixture
 def sample_workflow(workflow):
     """提供示例工作流"""
     from modules.workflow import WorkflowStep

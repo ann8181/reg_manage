@@ -1,3 +1,7 @@
+"""
+Persona System - 身份、代理、账号管理模块
+"""
+
 import os
 import json
 from typing import Optional, Dict, List
@@ -10,6 +14,7 @@ from .quality import IdentityQualityScorer, ProxyQualityChecker
 from .manager import AccountManager, AccountPool
 from .proxy_pool import ProxyPoolManager
 from .selector import PersonaSelector, TaskContext, SelectionStrategy
+
 
 class PersonaSystem:
     def __init__(self, data_dir: str = "data/persona"):
@@ -73,11 +78,9 @@ class PersonaSystem:
         return self.identities_db.get_by_id(identity_id)
     
     def get_proxy(self, country: Optional[str] = None) -> Optional[Dict]:
-        """获取可用代理"""
         return self.proxy_manager.get_best_proxy(country=country, min_score=0)
     
     def auto_setup(self, service: str) -> Dict:
-        """自动准备身份和代理"""
         identity = self.select_identity_for_service(service)
         country = None
         if identity:
@@ -122,20 +125,6 @@ class PersonaSystem:
             "quality_distribution": quality_buckets
         }
     
-    def create_account(
-        self,
-        identity_id: str,
-        service: Dict,
-        credentials: Dict,
-        metadata: Optional[Dict] = None
-    ) -> Dict:
-        return self.account_manager.create_account(
-            identity_id=identity_id,
-            service=service,
-            credentials=credentials,
-            metadata=metadata
-        )
-    
     def register_account(
         self,
         service: str,
@@ -146,14 +135,12 @@ class PersonaSystem:
         extra_data: Optional[Dict] = None,
         encrypt_password: bool = True
     ) -> Dict:
-        """简化版注册账号"""
         service_info = {
             "name": service,
             "display_name": service.upper(),
             "category": self._get_service_category(service)
         }
         
-        from .database import CredentialVault
         crypto = CredentialVault()
         encrypted_password = crypto.encrypt(password) if encrypt_password else password
         
@@ -184,7 +171,6 @@ class PersonaSystem:
         return self.account_manager.get_account(account_id)
     
     def get_account_decrypted(self, service: str) -> Optional[Dict]:
-        """获取账号并解密密码"""
         account = self.account_manager.get_available_account(service)
         if account:
             encrypted_pw = account.get("credentials", {}).get("password", "")
@@ -238,7 +224,7 @@ class PersonaSystem:
         regenerate: bool = False
     ) -> Optional[Dict]:
         return self.selector.select_identity(
-            service=service, 
+            service=service,
             strategy=strategy,
             identity_id=identity_id,
             regenerate=regenerate
@@ -311,7 +297,7 @@ def create_persona_system(data_dir: str = "data/persona") -> PersonaSystem:
 
 __all__ = [
     "PersonaSystem",
-    "IdentityGenerator", 
+    "IdentityGenerator",
     "FingerprintGenerator",
     "IdentityQualityScorer",
     "ProxyQualityChecker",
@@ -323,7 +309,6 @@ __all__ = [
     "SelectionStrategy",
     "JSONDatabase",
     "MultiDatabase",
+    "CredentialVault",
     "create_persona_system",
-    "PersonaLite",
-    "create_persona"
 ]

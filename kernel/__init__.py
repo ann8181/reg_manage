@@ -165,8 +165,8 @@ class Kernel:
     
     @property
     def account(self):
-        """账号模块"""
-        return self._modules.get("account")
+        """账号模块 (预留)"""
+        return None
     
     # ==================== 任务管理 ====================
     

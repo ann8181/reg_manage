@@ -239,12 +239,22 @@ class WorkflowModule:
         return [s.id for s in workflow.steps if s.id not in all_to]
     
     def _evaluate_condition(self, condition: str, context: Dict) -> bool:
-        """评估条件"""
+        """评估条件 (安全版本)"""
         if not condition:
             return True
         try:
-            return eval(condition, {"context": context})
-        except Exception:
+            import re
+            safe_pattern = re.compile(r'^[\w\s\+\-\*\/\(\)\.\<\>\=\!\&\|]+$')
+            if not safe_pattern.match(condition.strip()):
+                self.logger.warning(f"Condition contains unsafe characters: {condition}")
+                return False
+            allowed_names = {"context": context, "True": True, "False": False, "None": None}
+            for key, value in context.items():
+                if key.isidentifier():
+                    allowed_names[key] = value
+            return eval(condition, {"__builtins__": {}}, allowed_names)
+        except Exception as e:
+            self.logger.warning(f"Condition evaluation failed: {e}")
             return False
     
     def pause_workflow(self, workflow_id: str):

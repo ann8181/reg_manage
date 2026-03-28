@@ -4,9 +4,14 @@ User Module - 用户权限模块
 """
 
 import uuid
-import hashlib
 import secrets
 from typing import Dict, List, Optional
+
+try:
+    import bcrypt
+    HAS_BCRYPT = True
+except ImportError:
+    HAS_BCRYPT = False
 
 
 class UserRole:
@@ -45,11 +50,36 @@ class User:
         self.last_login = None
         self.login_count = 0
     
-    def _hash_password(self, password: str, salt: str = "") -> str:
-        return hashlib.sha256(f"{password}{salt}".encode()).hexdigest()
+    def _hash_password(self, password: str) -> str:
+        if not password:
+            return ""
+        if HAS_BCRYPT:
+            salt = bcrypt.gensalt()
+            return bcrypt.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+        import hashlib
+        import base64
+        salt = secrets.token_hex(16)
+        hash_obj = hashlib.sha256()
+        hash_obj.update(f"{password}{salt}".encode('utf-8'))
+        return f"{base64.b64encode(salt.encode()).decode()}:{hash_obj.hexdigest()}"
     
     def check_password(self, password: str) -> bool:
-        return self.password_hash == self._hash_password(password)
+        if not password or not self.password_hash:
+            return False
+        if HAS_BCRYPT and self.password_hash.startswith('$2'):
+            return bcrypt.checkpw(password.encode('utf-8'), self.password_hash.encode('utf-8'))
+        if ':' in self.password_hash:
+            try:
+                salt_b64, stored_hash = self.password_hash.split(':')
+                import hashlib
+                import base64
+                salt = base64.b64decode(salt_b64.encode()).decode()
+                hash_obj = hashlib.sha256()
+                hash_obj.update(f"{password}{salt}".encode('utf-8'))
+                return hash_obj.hexdigest() == stored_hash
+            except Exception:
+                return False
+        return False
     
     def to_dict(self, safe: bool = True) -> Dict:
         data = {

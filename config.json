@@ -1,190 +1,191 @@
 {
-    "browser_path": "",
-    "proxy": "",
-    "bot_protection_wait": 12,
-    "max_captcha_retries": 2,
-    "concurrent_flows": 5,
-    "max_tasks": 50,
-    "results_base_dir": "results",
-    "logs_base_dir": "logs",
-    "temp_email_provider": "temp-mail-asia",
-    "temp_mail_awsl_url": "",
-    "temp_mail_awsl_jwt": "",
-    "email_providers": {
-        "mailtm": {
-            "api_url": "https://api.mail.tm"
-        },
-        "guerrillamail": {
-            "api_url": "https://api.guerrillamail.com"
-        },
-        "getnada": {
-            "api_url": "https://getnada.com/api"
-        },
-        "yopmail": {
-            "api_url": "https://api.yopmail.com"
-        },
-        "1secmail": {
-            "api_url": "https://www.1secmail.com"
-        },
-        "tempmailorg": {
-            "api_url": "https://temp-mail.org/en/api/v2"
-        },
-        "gmailnator": {
-            "api_url": "https://www.gmailnator.com/api/v1"
-        },
-        "fakemail": {
-            "api_url": "https://fakemail.top"
-        },
-        "fakemailcloudflare": {
-            "api_url": "https://fakemail.top"
-        },
-        "selfhosted": {
-            "api_url": "http://localhost:8025"
-        },
-        "mailsac": {
-            "api_url": "https://mailsac.com/api",
-            "api_key": "",
-            "domain": "mailsac.com"
-        },
-        "temp-mail-asia": {
-            "api_url": "https://www.v3.temp-mail.asia"
-        },
-        "emailnator": {
-            "api_url": "https://emailnator.com"
-        }
+  "browser_path": "",
+  "proxy": "",
+  "bot_protection_wait": 12,
+  "max_captcha_retries": 2,
+  "concurrent_flows": 5,
+  "max_tasks": 50,
+  "results_base_dir": "results",
+  "logs_base_dir": "logs",
+  "temp_email_provider": "temp-mail-asia",
+  "temp_mail_awsl_url": "",
+  "temp_mail_awsl_jwt": "",
+  "email_providers": {
+    "mailtm": {
+      "api_url": "https://api.mail.tm"
     },
-    "sms_services": {
-        "freeotpapi": {
-            "api_url": "https://free-otp-api-8e544c41220a.herokuapp.com"
-        },
-        "otpgateway": {
-            "api_url": "http://localhost:9000"
-        }
+    "guerrillamail": {
+      "api_url": "https://api.guerrillamail.com"
     },
-    "proxy_services": {
-        "pool": {
-            "api_url": "http://localhost:8080"
-        },
-        "db_path": "results/proxies.db",
-        "grabber": {
-            "enabled": true,
-            "github_sources": 18,
-            "public_sources": 7,
-            "max_per_source": 50
-        },
-        "validator": {
-            "max_concurrent": 50,
-            "timeout": 10,
-            "test_urls": [
-                "https://httpbin.org/ip",
-                "https://api.ipify.org?format=json"
-            ]
-        },
-        "cache": {
-            "ttl_minutes": 30
-        }
+    "getnada": {
+      "api_url": "https://getnada.com/api"
     },
-    "captcha_services": {
-        "2captcha": {
-            "api_key": ""
-        },
-        "anticaptcha": {
-            "api_key": ""
-        }
+    "yopmail": {
+      "api_url": "https://api.yopmail.com"
     },
-    "ai_services": {
-        "github": {
-            "signup_url": "https://github.com/signup"
-        },
-        "claude": {
-            "signup_url": "https://claude.ai/signup"
-        },
-        "gpt": {
-            "api_url": "https://api.openai.com"
-        },
-        "gemini": {
-            "api_url": "https://generativelanguage.googleapis.com"
-        },
-        "aistudio": {
-            "signup_url": "https://aistudio.google.com"
-        },
-        "business_gemini": {
-            "signup_url": "https://ai.google.dev"
-        },
-        "grok": {
-            "signup_url": "https://x.ai"
-        },
-        "copilot": {
-            "signup_url": "https://github.com/features/copilot"
-        },
-        "cursor": {
-            "signup_url": "https://cursor.sh"
-        },
-        "augment": {
-            "signup_url": "https://www.augment.dev"
-        },
-        "windsurf": {
-            "signup_url": "https://windsurf.ai"
-        },
-        "codex": {
-            "api_url": "https://api.openai.com/v1/engines/davinci-codex/completions"
-        },
-        "trae": {
-            "signup_url": "https://www.trae.ai/sign-up"
-        },
-        "opencode": {
-            "signup_url": "https://opencode.ai"
-        },
-        "kiro": {
-            "signup_url": "https://kiro.dev"
-        },
-        "zen": {
-            "signup_url": "https://zen.ai"
-        },
-        "nvidia": {
-            "signup_url": "https://ngc.nvidia.com"
-        },
-        "perplexity": {
-            "signup_url": "https://www.perplexity.ai"
-        },
-        "deepseek": {
-            "signup_url": "https://platform.deepseek.com"
-        },
-        "mistral": {
-            "signup_url": "https://mistral.ai"
-        },
-        "groq": {
-            "signup_url": "https://console.groq.com"
-        },
-        "cohere": {
-            "signup_url": "https://cohere.com"
-        },
-        "replicate": {
-            "signup_url": "https://replicate.com"
-        },
-        "kimi": {
-            "signup_url": "https://kimi.moonshot.cn"
-        },
-        "step": {
-            "signup_url": "https://step.com"
-        },
-        "zhipuai": {
-            "signup_url": "https://open.bigmodel.cn"
-        },
-        "minimax": {
-            "signup_url": "https://www.minimax.io"
-        },
-        "yuanbao": {
-            "signup_url": "https://yuanbao.tencent.com"
-        },
-        "openrelay": {
-            "api_url": "https://openrelay.ai"
-        },
-        "freeapihub": {
-            "api_url": "https://api.free-api-hub.com"
-        },
-        "chat2api": {
-            "api_url": "https://api.chat2api.cn"
-        }
+    "1secmail": {
+      "api_url": "https://www.1secmail.com"
+    },
+    "tempmailorg": {
+      "api_url": "https://temp-mail.org/en/api/v2"
+    },
+    "gmailnator": {
+      "api_url": "https://www.gmailnator.com/api/v1"
+    },
+    "fakemail": {
+      "api_url": "https://fakemail.top"
+    },
+    "fakemailcloudflare": {
+      "api_url": "https://fakemail.top"
+    },
+    "selfhosted": {
+      "api_url": "http://localhost:8025"
+    },
+    "mailsac": {
+      "api_url": "https://mailsac.com/api",
+      "api_key": "",
+      "domain": "mailsac.com"
+    },
+    "temp-mail-asia": {
+      "api_url": "https://www.v3.temp-mail.asia"
+    },
+    "emailnator": {
+      "api_url": "https://emailnator.com"
     }
+  },
+  "sms_services": {
+    "freeotpapi": {
+      "api_url": "https://free-otp-api-8e544c41220a.herokuapp.com"
+    },
+    "otpgateway": {
+      "api_url": "http://localhost:9000"
+    }
+  },
+  "proxy_services": {
+    "pool": {
+      "api_url": "http://localhost:8080"
+    },
+    "db_path": "results/proxies.db",
+    "grabber": {
+      "enabled": true,
+      "github_sources": 18,
+      "public_sources": 7,
+      "max_per_source": 50
+    },
+    "validator": {
+      "max_concurrent": 50,
+      "timeout": 10,
+      "test_urls": [
+        "https://httpbin.org/ip",
+        "https://api.ipify.org?format=json"
+      ]
+    },
+    "cache": {
+      "ttl_minutes": 30
+    }
+  },
+  "captcha_services": {
+    "2captcha": {
+      "api_key": ""
+    },
+    "anticaptcha": {
+      "api_key": ""
+    }
+  },
+  "ai_services": {
+    "github": {
+      "signup_url": "https://github.com/signup"
+    },
+    "claude": {
+      "signup_url": "https://claude.ai/signup"
+    },
+    "gpt": {
+      "api_url": "https://api.openai.com"
+    },
+    "gemini": {
+      "api_url": "https://generativelanguage.googleapis.com"
+    },
+    "aistudio": {
+      "signup_url": "https://aistudio.google.com"
+    },
+    "business_gemini": {
+      "signup_url": "https://ai.google.dev"
+    },
+    "grok": {
+      "signup_url": "https://x.ai"
+    },
+    "copilot": {
+      "signup_url": "https://github.com/features/copilot"
+    },
+    "cursor": {
+      "signup_url": "https://cursor.sh"
+    },
+    "augment": {
+      "signup_url": "https://www.augment.dev"
+    },
+    "windsurf": {
+      "signup_url": "https://windsurf.ai"
+    },
+    "codex": {
+      "api_url": "https://api.openai.com/v1/engines/davinci-codex/completions"
+    },
+    "trae": {
+      "signup_url": "https://www.trae.ai/sign-up"
+    },
+    "opencode": {
+      "signup_url": "https://opencode.ai"
+    },
+    "kiro": {
+      "signup_url": "https://kiro.dev"
+    },
+    "zen": {
+      "signup_url": "https://zen.ai"
+    },
+    "nvidia": {
+      "signup_url": "https://ngc.nvidia.com"
+    },
+    "perplexity": {
+      "signup_url": "https://www.perplexity.ai"
+    },
+    "deepseek": {
+      "signup_url": "https://platform.deepseek.com"
+    },
+    "mistral": {
+      "signup_url": "https://mistral.ai"
+    },
+    "groq": {
+      "signup_url": "https://console.groq.com"
+    },
+    "cohere": {
+      "signup_url": "https://cohere.com"
+    },
+    "replicate": {
+      "signup_url": "https://replicate.com"
+    },
+    "kimi": {
+      "signup_url": "https://kimi.moonshot.cn"
+    },
+    "step": {
+      "signup_url": "https://step.com"
+    },
+    "zhipuai": {
+      "signup_url": "https://open.bigmodel.cn"
+    },
+    "minimax": {
+      "signup_url": "https://www.minimax.io"
+    },
+    "yuanbao": {
+      "signup_url": "https://yuanbao.tencent.com"
+    },
+    "openrelay": {
+      "api_url": "https://openrelay.ai"
+    },
+    "freeapihub": {
+      "api_url": "https://api.free-api-hub.com"
+    },
+    "chat2api": {
+      "api_url": "https://api.chat2api.cn"
+    }
+  },
+  "new_key": "new_value"
 }

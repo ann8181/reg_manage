@@ -155,6 +155,185 @@ class GuerrillaMailProvider(Provider):
         self._client.close()
 
 
+class GetnadaProvider(Provider):
+    """Getnada Provider - 临时邮箱服务"""
+    
+    def __init__(self, api_url: str = "https://getnada.com"):
+        super().__init__("getnada", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        import secrets
+        username = secrets.token_hex(6)
+        self._email = f"{username}@getnada.com"
+        return self._email, "temp1234"
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        try:
+            resp = self._client.get(f"{self.api_url}/api/v1/messages/{email}")
+            if resp.status_code == 200:
+                data = resp.json()
+                return data.get("messages", [])
+        except Exception:
+            pass
+        return []
+    
+    def get_verification_code(self, email: str, **kwargs) -> Optional[str]:
+        import time
+        import re
+        
+        max_wait = kwargs.get("max_wait", 120)
+        poll_interval = kwargs.get("poll_interval", 5)
+        
+        start = time.time()
+        while time.time() - start < max_wait:
+            messages = self.get_messages(email)
+            for msg in messages:
+                body = msg.get("text", "")
+                codes = re.findall(r'\b\d{6}\b', body)
+                if codes:
+                    return codes[0]
+                codes = re.findall(r'\b\d{4}\b', body)
+                if codes:
+                    return codes[0]
+            time.sleep(poll_interval)
+        return None
+    
+    def close(self):
+        self._client.close()
+
+
+class TenMinuteMailProvider(Provider):
+    """10MinuteMail Provider"""
+    
+    def __init__(self, api_url: str = "https://10minutemail.com"):
+        super().__init__("10minutemail", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        try:
+            resp = self._client.post(f"{self.api_url}/address/api/react")
+            if resp.status_code == 200:
+                data = resp.json()
+                self._email = data.get("email", "")
+                return self._email, data.get("password", "")
+        except Exception:
+            pass
+        return "", ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        try:
+            resp = self._client.get(f"{self.api_url}/mailbox/api/messages/{email}")
+            if resp.status_code == 200:
+                return resp.json()
+        except Exception:
+            pass
+        return []
+    
+    def get_verification_code(self, email: str, **kwargs) -> Optional[str]:
+        import time
+        import re
+        
+        max_wait = kwargs.get("max_wait", 120)
+        poll_interval = kwargs.get("poll_interval", 5)
+        
+        start = time.time()
+        while time.time() - start < max_wait:
+            messages = self.get_messages(email)
+            for msg in messages:
+                body = msg.get("body_text", "")
+                codes = re.findall(r'\b\d{6}\b', body)
+                if codes:
+                    return codes[0]
+                codes = re.findall(r'\b\d{4}\b', body)
+                if codes:
+                    return codes[0]
+            time.sleep(poll_interval)
+        return None
+    
+    def close(self):
+        self._client.close()
+
+
+class YopMailProvider(Provider):
+    """YopMail Provider - 一次性临时邮箱"""
+    
+    def __init__(self, api_url: str = "https://yopmail.com"):
+        super().__init__("yopmail", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+        self._inbox_id = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        import secrets
+        username = secrets.token_hex(6)
+        self._email = f"{username}@yopmail.com"
+        self._inbox_id = username
+        return self._email, ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        try:
+            inbox_id = email.split("@")[0]
+            resp = self._client.get(
+                f"{self.api_url}/mailbox.php?b={inbox_id}",
+                headers={"Accept": "text/html"}
+            )
+            if resp.status_code == 200:
+                import re
+                mail_ids = re.findall(r'mail=(\w+)&r=', resp.text)
+                messages = []
+                for mid in mail_ids[:10]:
+                    messages.append({"id": mid, "subject": "New message"})
+                return messages
+        except Exception:
+            pass
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
+class TempMailProvider(Provider):
+    """TempMail Provider"""
+    
+    def __init__(self, api_url: str = "https://temp-mail.org"):
+        super().__init__("tempmail", api_url)
+        self._client = httpx.Client(timeout=self.timeout)
+        self._email = ""
+    
+    def create_email(self) -> Tuple[str, str]:
+        try:
+            resp = self._client.get(f"{self.api_url}/en/option/change/")
+            if resp.status_code == 200:
+                import re
+                email_match = re.search(r'value="([^"]+@[^"]+)"', resp.text)
+                if email_match:
+                    self._email = email_match.group(1)
+                    return self._email, ""
+        except Exception:
+            pass
+        return "", ""
+    
+    def get_messages(self, email: str) -> List[Dict]:
+        try:
+            resp = self._client.get(f"{self.api_url}/en/option/mailbox/{email}/")
+            if resp.status_code == 200:
+                import re
+                messages = []
+                subjects = re.findall(r'class="mail-subject">([^<]+)<', resp.text)
+                for i, subject in enumerate(subjects[:10]):
+                    messages.append({"id": str(i), "subject": subject.strip()})
+                return messages
+        except Exception:
+            pass
+        return []
+    
+    def close(self):
+        self._client.close()
+
+
 class ProviderModule:
     """
     Provider模块
@@ -164,6 +343,10 @@ class ProviderModule:
     _providers = {
         "mailtm": MailTmProvider,
         "guerrilla": GuerrillaMailProvider,
+        "getnada": GetnadaProvider,
+        "10minutemail": TenMinuteMailProvider,
+        "yopmail": YopMailProvider,
+        "tempmail": TempMailProvider,
     }
     
     def __init__(self, kernel):

@@ -185,6 +185,21 @@
         },
         "chat2api": {
             "api_url": "https://api.chat2api.cn"
+        },
+        "warp": {
+            "signup_url": "https://www.warp.dev/get-started"
+        },
+        "antigravity": {
+            "signup_url": "https://antigravity.dev"
+        },
+        "claude_code": {
+            "signup_url": "https://docs.anthropic.com/en/docs/claude-code"
+        },
+        "octo_terminal": {
+            "signup_url": "https://octoterm.com"
+        },
+        "ai_terminal": {
+            "signup_url": "https://ai-terminal.com"
         }
     }
 }

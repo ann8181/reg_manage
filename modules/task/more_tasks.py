@@ -629,3 +629,208 @@ class MistralRegisterTask(MoreServiceTask):
             return {"success": False, "error": str(e)}
         finally:
             self._close_browser(browser_id)
+
+
+class WarpRegisterTask(MoreServiceTask):
+    """Warp Terminal 注册任务"""
+    
+    def execute(self) -> Dict[str, Any]:
+        browser = self._get_browser()
+        if not browser:
+            return {"success": False, "error": "Browser not available"}
+        
+        result = browser.create_browser()
+        if not result:
+            return {"success": False, "error": "Failed to create browser"}
+        
+        browser_id = result.get("browser_id")
+        try:
+            browser.navigate(browser_id, "https://www.warp.dev/")
+            browser.wait(2)
+            browser.click(browser_id, "a[href='/get-started']")
+            browser.wait(2)
+            
+            return {"success": True, "email": self.email, "message": "Warp signup accessed"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            self._close_browser(browser_id)
+
+
+class AntigravityRegisterTask(MoreServiceTask):
+    """Antigravity 反重力 AI 注册任务"""
+    
+    def execute(self) -> Dict[str, Any]:
+        browser = self._get_browser()
+        if not browser:
+            return {"success": False, "error": "Browser not available"}
+        
+        result = browser.create_browser()
+        if not result:
+            return {"success": False, "error": "Failed to create browser"}
+        
+        browser_id = result.get("browser_id")
+        try:
+            browser.navigate(browser_id, "https://antigravity.dev/")
+            browser.wait(2)
+            browser.click(browser_id, "a[href*='signup'")
+            browser.wait(2)
+            
+            return {"success": True, "email": self.email, "message": "Antigravity signup accessed"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            self._close_browser(browser_id)
+
+
+class ClaudeCodeRegisterTask(MoreServiceTask):
+    """Claude Code CLI 注册任务"""
+    
+    def execute(self) -> Dict[str, Any]:
+        browser = self._get_browser()
+        if not browser:
+            return {"success": False, "error": "Browser not available"}
+        
+        result = browser.create_browser()
+        if not result:
+            return {"success": False, "error": "Failed to create browser"}
+        
+        browser_id = result.get("browser_id")
+        try:
+            browser.navigate(browser_id, "https://docs.anthropic.com/en/docs/claude-code")
+            browser.wait(2)
+            browser.click(browser_id, "a[href*='signup']")
+            browser.wait(2)
+            
+            return {"success": True, "email": self.email, "message": "Claude Code signup accessed"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            self._close_browser(browser_id)
+
+
+class QoderSetupTask(MoreServiceTask):
+    """Qoder 开发环境配置任务"""
+    
+    def execute(self) -> Dict[str, Any]:
+        import subprocess
+        import shutil
+        
+        qoder_path = shutil.which("qoder") or self.params.get("install_path", "")
+        
+        if not qoder_path:
+            install_cmd = self.params.get("install_command", "npm install -g qoder")
+            try:
+                result = subprocess.run(
+                    install_cmd.split(),
+                    capture_output=True,
+                    text=True,
+                    timeout=120
+                )
+                return {
+                    "success": result.returncode == 0,
+                    "message": "Qoder installed" if result.returncode == 0 else "Install failed",
+                    "output": result.stdout if result.returncode == 0 else result.stderr
+                }
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+        
+        return {
+            "success": True,
+            "message": "Qoder already installed",
+            "path": qoder_path
+        }
+
+
+class MaramSetupTask(MoreServiceTask):
+    """Maram 文件树工具安装任务"""
+    
+    def execute(self) -> Dict[str, Any]:
+        import subprocess
+        import platform
+        
+        system = platform.system().lower()
+        arch = platform.machine().lower()
+        
+        install_commands = {
+            "linux": {
+                "x86_64": "curl -Ls https://github.com/mufeedvh/maram/releases/latest/download/maram_linux_amd64.tar.gz | tar xz",
+                "aarch64": "curl -Ls https://github.com/mufeedvh/maram/releases/latest/download/maram_linux_arm64.tar.gz | tar xz"
+            },
+            "darwin": {
+                "x86_64": "curl -Ls https://github.com/mufeedvh/maram/releases/latest/download/maram_darwin_amd64.tar.gz | tar xz",
+                "aarch64": "curl -Ls https://github.com/mufeedvh/maram/releases/latest/download/maram_darwin_arm64.tar.gz | tar xz"
+            }
+        }
+        
+        cmd = install_commands.get(system, {}).get(arch, "")
+        if not cmd:
+            return {"success": False, "error": f"No install command for {system}/{arch}"}
+        
+        try:
+            result = subprocess.run(
+                cmd.split(),
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            return {
+                "success": result.returncode == 0,
+                "message": "Maram installed successfully" if result.returncode == 0 else "Install failed",
+                "system": system,
+                "arch": arch
+            }
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+
+
+class OctoTerminalRegisterTask(MoreServiceTask):
+    """Octo Terminal AI IDE 注册任务"""
+    
+    def execute(self) -> Dict[str, Any]:
+        browser = self._get_browser()
+        if not browser:
+            return {"success": False, "error": "Browser not available"}
+        
+        result = browser.create_browser()
+        if not result:
+            return {"success": False, "error": "Failed to create browser"}
+        
+        browser_id = result.get("browser_id")
+        try:
+            browser.navigate(browser_id, "https://octoterm.com/")
+            browser.wait(2)
+            browser.click(browser_id, "a[href*='download'")
+            browser.wait(2)
+            
+            return {"success": True, "email": self.email, "message": "Octo Terminal accessed"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            self._close_browser(browser_id)
+
+
+class AITerminalRegisterTask(MoreServiceTask):
+    """AI Terminal 注册任务"""
+    
+    def execute(self) -> Dict[str, Any]:
+        browser = self._get_browser()
+        if not browser:
+            return {"success": False, "error": "Browser not available"}
+        
+        result = browser.create_browser()
+        if not result:
+            return {"success": False, "error": "Failed to create browser"}
+        
+        browser_id = result.get("browser_id")
+        try:
+            browser.navigate(browser_id, "https://ai-terminal.com/")
+            browser.wait(2)
+            browser.click(browser_id, "a[href*='signup'")
+            browser.wait(2)
+            
+            return {"success": True, "email": self.email, "message": "AI Terminal signup accessed"}
+        except Exception as e:
+            return {"success": False, "error": str(e)}
+        finally:
+            self._close_browser(browser_id)

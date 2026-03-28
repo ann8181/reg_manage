@@ -453,6 +453,69 @@
                             "results_dir": "results/yuanbao"
                         }
                     }
+                },
+                "cli_tools": {
+                    "name": "CLI 终端工具",
+                    "description": "各种 CLI 终端和开发者工具",
+                    "enabled": true,
+                    "tasks": {
+                        "cli.warp": {
+                            "name": "Warp Terminal 注册",
+                            "description": "Warp AI 驱动终端注册",
+                            "enabled": true,
+                            "module": "tasks.more",
+                            "class": "WarpRegisterTask",
+                            "results_dir": "results/warp"
+                        },
+                        "cli.antigravity": {
+                            "name": "Antigravity 反重力注册",
+                            "description": "Antigravity 反重力 AI 注册",
+                            "enabled": true,
+                            "module": "tasks.more",
+                            "class": "AntigravityRegisterTask",
+                            "results_dir": "results/antigravity"
+                        },
+                        "cli.claude_code": {
+                            "name": "Claude Code 注册",
+                            "description": "Claude Code CLI 注册",
+                            "enabled": true,
+                            "module": "tasks.more",
+                            "class": "ClaudeCodeRegisterTask",
+                            "results_dir": "results/claude_code"
+                        },
+                        "cli.octo_terminal": {
+                            "name": "Octo Terminal 注册",
+                            "description": "Octo Terminal AI IDE 注册",
+                            "enabled": true,
+                            "module": "tasks.more",
+                            "class": "OctoTerminalRegisterTask",
+                            "results_dir": "results/octo_terminal"
+                        },
+                        "cli.ai_terminal": {
+                            "name": "AI Terminal 注册",
+                            "description": "AI Terminal 注册",
+                            "enabled": true,
+                            "module": "tasks.more",
+                            "class": "AITerminalRegisterTask",
+                            "results_dir": "results/ai_terminal"
+                        },
+                        "cli.qoder": {
+                            "name": "Qoder 安装配置",
+                            "description": "Qoder 开发环境安装配置",
+                            "enabled": true,
+                            "module": "tasks.more",
+                            "class": "QoderSetupTask",
+                            "results_dir": "results/qoder"
+                        },
+                        "cli.maram": {
+                            "name": "Maram 安装配置",
+                            "description": "Maram 现代文件树工具安装",
+                            "enabled": true,
+                            "module": "tasks.more",
+                            "class": "MaramSetupTask",
+                            "results_dir": "results/maram"
+                        }
+                    }
                 }
             }
         },

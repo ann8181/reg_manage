@@ -1,0 +1,346 @@
+{
+    "templates": [
+        {
+            "id": "ai-batch-register",
+            "name": "AI 服务批量注册",
+            "description": "批量注册多个 AI 服务并获取验证码",
+            "category": "ai",
+            "version": "1.0.0",
+            "parameters": [
+                {
+                    "name": "email",
+                    "description": "注册邮箱",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "services",
+                    "description": "要注册的服务列表",
+                    "type": "array",
+                    "required": false,
+                    "options": ["github", "claude", "gpt", "gemini", "cursor", "warp", "antigravity"]
+                }
+            ],
+            "steps": [
+                {
+                    "id": "create_email",
+                    "name": "创建临时邮箱",
+                    "step_type": "task",
+                    "task_id": "email.create",
+                    "params": {}
+                },
+                {
+                    "id": "register_github",
+                    "name": "注册 GitHub",
+                    "step_type": "task",
+                    "task_id": "ai.github",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "wait_github_code",
+                    "name": "获取 GitHub 验证码",
+                    "step_type": "task",
+                    "task_id": "email.get_code",
+                    "params": {"email": "{{email}}", "subject_contains": "GitHub"}
+                },
+                {
+                    "id": "register_claude",
+                    "name": "注册 Claude",
+                    "step_type": "task",
+                    "task_id": "ai.claude",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "wait_claude_code",
+                    "name": "获取 Claude 验证码",
+                    "step_type": "task",
+                    "task_id": "email.get_code",
+                    "params": {"email": "{{email}}", "subject_contains": "Anthropic"}
+                }
+            ],
+            "edges": [
+                {"from": "create_email", "to": "register_github"},
+                {"from": "register_github", "to": "wait_github_code"},
+                {"from": "create_email", "to": "register_claude"},
+                {"from": "register_claude", "to": "wait_claude_code"}
+            ],
+            "tags": ["ai", "batch", "registration"],
+            "author": "system"
+        },
+        {
+            "id": "cli-tools-setup",
+            "name": "CLI 开发工具全家桶",
+            "description": "一站式安装配置现代 CLI 开发工具",
+            "category": "devtools",
+            "version": "1.0.0",
+            "parameters": [
+                {
+                    "name": "install_all",
+                    "description": "安装所有工具",
+                    "type": "boolean",
+                    "required": false,
+                    "default": true
+                },
+                {
+                    "name": "tools",
+                    "description": "选择要安装的工具",
+                    "type": "array",
+                    "required": false,
+                    "options": ["qoder", "maram", "bat", "eza", "fd", "ripgrep"]
+                }
+            ],
+            "steps": [
+                {
+                    "id": "check_system",
+                    "name": "检查系统环境",
+                    "step_type": "task",
+                    "task_id": "system.check",
+                    "params": {}
+                },
+                {
+                    "id": "install_qoder",
+                    "name": "安装 Qoder",
+                    "step_type": "task",
+                    "task_id": "cli.qoder",
+                    "params": {}
+                },
+                {
+                    "id": "install_maram",
+                    "name": "安装 Maram",
+                    "step_type": "task",
+                    "task_id": "cli.maram",
+                    "params": {}
+                },
+                {
+                    "id": "configure_shell",
+                    "name": "配置 Shell 环境",
+                    "step_type": "task",
+                    "task_id": "system.configure",
+                    "params": {"shell": "zsh"}
+                }
+            ],
+            "edges": [
+                {"from": "check_system", "to": "install_qoder"},
+                {"from": "check_system", "to": "install_maram"},
+                {"from": "install_qoder", "to": "configure_shell"},
+                {"from": "install_maram", "to": "configure_shell"}
+            ],
+            "tags": ["cli", "devtools", "setup"],
+            "author": "system"
+        },
+        {
+            "id": "email-ai-register",
+            "name": "邮箱 + AI 服务注册",
+            "description": "创建临时邮箱并注册多个 AI 服务",
+            "category": "registration",
+            "version": "1.0.0",
+            "parameters": [
+                {
+                    "name": "provider",
+                    "description": "临时邮箱提供商",
+                    "type": "string",
+                    "required": false,
+                    "default": "mailtm",
+                    "options": ["mailtm", "guerrillamail", "getnada", "yopmail"]
+                },
+                {
+                    "name": "ai_services",
+                    "description": "要注册的 AI 服务",
+                    "type": "array",
+                    "required": true,
+                    "options": ["warp", "antigravity", "claude_code", "octo_terminal", "ai_terminal"]
+                }
+            ],
+            "steps": [
+                {
+                    "id": "create_temp_email",
+                    "name": "创建临时邮箱",
+                    "step_type": "task",
+                    "task_id": "email.create",
+                    "params": {"provider": "{{provider}}"}
+                },
+                {
+                    "id": "get_email_address",
+                    "name": "获取邮箱地址",
+                    "step_type": "task",
+                    "task_id": "email.get_address",
+                    "params": {}
+                },
+                {
+                    "id": "register_warp",
+                    "name": "注册 Warp",
+                    "step_type": "task",
+                    "task_id": "cli.warp",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_antigravity",
+                    "name": "注册 Antigravity",
+                    "step_type": "task",
+                    "task_id": "cli.antigravity",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_claude_code",
+                    "name": "注册 Claude Code",
+                    "step_type": "task",
+                    "task_id": "cli.claude_code",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "fetch_codes",
+                    "name": "收取验证码",
+                    "step_type": "task",
+                    "task_id": "email.fetch_all",
+                    "params": {}
+                }
+            ],
+            "edges": [
+                {"from": "create_temp_email", "to": "get_email_address"},
+                {"from": "get_email_address", "to": "register_warp"},
+                {"from": "get_email_address", "to": "register_antigravity"},
+                {"from": "get_email_address", "to": "register_claude_code"},
+                {"from": "register_warp", "to": "fetch_codes"},
+                {"from": "register_antigravity", "to": "fetch_codes"},
+                {"from": "register_claude_code", "to": "fetch_codes"}
+            ],
+            "tags": ["email", "ai", "registration"],
+            "author": "system"
+        },
+        {
+            "id": "ide-ai-suite",
+            "name": "AI IDE 全家桶",
+            "description": "批量注册主流 AI IDE 和编程工具",
+            "category": "ai",
+            "version": "1.0.0",
+            "parameters": [
+                {
+                    "name": "email",
+                    "description": "注册邮箱",
+                    "type": "string",
+                    "required": true
+                }
+            ],
+            "steps": [
+                {
+                    "id": "register_cursor",
+                    "name": "注册 Cursor",
+                    "step_type": "task",
+                    "task_id": "ai.cursor",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_windsurf",
+                    "name": "注册 Windsurf",
+                    "step_type": "task",
+                    "task_id": "ai.windsurf",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_trae",
+                    "name": "注册 Trae",
+                    "step_type": "task",
+                    "task_id": "ai.trae",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_zen",
+                    "name": "注册 Zen",
+                    "step_type": "task",
+                    "task_id": "ai.zen",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_kiro",
+                    "name": "注册 Kiro",
+                    "step_type": "task",
+                    "task_id": "ai.kiro",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_opencode",
+                    "name": "注册 OpenCode",
+                    "step_type": "task",
+                    "task_id": "ai.opencode",
+                    "params": {"email": "{{email}}"}
+                }
+            ],
+            "edges": [
+                {"from": "register_cursor", "to": "register_windsurf"},
+                {"from": "register_windsurf", "to": "register_trae"},
+                {"from": "register_trae", "to": "register_zen"},
+                {"from": "register_zen", "to": "register_kiro"},
+                {"from": "register_kiro", "to": "register_opencode"}
+            ],
+            "tags": ["ai", "ide", "coding", "suite"],
+            "author": "system"
+        },
+        {
+            "id": "chinese-ai-batch",
+            "name": "国产 AI 服务批量注册",
+            "description": "批量注册国产 AI 服务：Kimi、智谱、MiniMax 等",
+            "category": "ai",
+            "version": "1.0.0",
+            "parameters": [
+                {
+                    "name": "email",
+                    "description": "注册邮箱",
+                    "type": "string",
+                    "required": true
+                },
+                {
+                    "name": "services",
+                    "description": "选择服务",
+                    "type": "array",
+                    "required": false,
+                    "options": ["kimi", "step", "zhipuai", "minimax", "yuanbao"]
+                }
+            ],
+            "steps": [
+                {
+                    "id": "register_kimi",
+                    "name": "注册 Kimi",
+                    "step_type": "task",
+                    "task_id": "ai.kimi",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_step",
+                    "name": "注册 Step",
+                    "step_type": "task",
+                    "task_id": "ai.step",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_zhipuai",
+                    "name": "注册智谱AI",
+                    "step_type": "task",
+                    "task_id": "ai.zhipuai",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_minimax",
+                    "name": "注册 MiniMax",
+                    "step_type": "task",
+                    "task_id": "ai.minimax",
+                    "params": {"email": "{{email}}"}
+                },
+                {
+                    "id": "register_yuanbao",
+                    "name": "注册腾讯元宝",
+                    "step_type": "task",
+                    "task_id": "ai.yuanbao",
+                    "params": {"email": "{{email}}"}
+                }
+            ],
+            "edges": [
+                {"from": "register_kimi", "to": "register_step"},
+                {"from": "register_step", "to": "register_zhipuai"},
+                {"from": "register_zhipuai", "to": "register_minimax"},
+                {"from": "register_minimax", "to": "register_yuanbao"}
+            ],
+            "tags": ["ai", "chinese", "batch"],
+            "author": "system"
+        }
+    ]
+}

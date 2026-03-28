@@ -193,6 +193,11 @@ class Kernel:
         """队列模块"""
         return self._modules.get("queue")
     
+    @property
+    def template(self):
+        """模板模块"""
+        return self._modules.get("template")
+    
     # ==================== 任务管理 ====================
     
     def register_task(self, task_id: str, task_class: Callable) -> None:
@@ -295,6 +300,7 @@ class Kernel:
         from modules.metrics import MetricsModule
         from modules.webhook import WebhookModule
         from modules.queue import QueueModule
+        from modules.template import TemplateModule
         
         self.register_module("scheduler", SchedulerModule(self))
         self.register_module("browser", BrowserModule(self))
@@ -307,6 +313,7 @@ class Kernel:
         self.register_module("metrics", MetricsModule(self))
         self.register_module("webhook", WebhookModule(self))
         self.register_module("queue", QueueModule(self))
+        self.register_module("template", TemplateModule(self))
     
     # ==================== 钩子系统 ====================
     

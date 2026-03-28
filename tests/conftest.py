@@ -148,6 +148,15 @@ def queue(kernel):
 
 
 @pytest.fixture
+def template(kernel):
+    """提供 TemplateModule 实例"""
+    from modules.template import TemplateModule
+    template_module = TemplateModule(kernel)
+    yield template_module
+    template_module.stop()
+
+
+@pytest.fixture
 def sample_workflow(workflow):
     """提供示例工作流"""
     from modules.workflow import WorkflowStep
